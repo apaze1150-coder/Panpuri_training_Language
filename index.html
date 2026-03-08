@@ -26,7 +26,6 @@
     </div>
 
     <div class="p-5 flex flex-col gap-4 flex-grow">
-        
         <div>
             <label class="block mb-2 text-sm font-medium text-gray-700">เลือกหมวดหมู่สินค้า:</label>
             <select id="categorySelect" onchange="changeCategory()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5 shadow-sm">
@@ -36,16 +35,21 @@
 
         <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center relative shadow-sm mt-2">
             <span id="categoryBadge" class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-black text-white text-[10px] px-3 py-1 rounded-full tracking-widest">-</span>
-            <img id="productImage" src="" alt="Product Image" class="w-32 h-32 object-contain mx-auto rounded-lg mb-3 hidden shadow-sm border border-gray-100 p-1">
+            
+            <img id="productImage" src="" alt="Product Image" class="w-32 h-32 object-contain mx-auto rounded-lg mb-3 hidden shadow-sm border border-gray-200 p-1 bg-white">
+            
             <p class="text-gray-400 text-xs mt-2">ประโยคเป้าหมาย:</p>
             <h2 id="chineseText" class="text-2xl font-bold text-gray-900 mt-2 mb-1">กำลังโหลด...</h2>
             <p id="pinyinText" class="text-gray-500 italic text-sm">-</p>
-            <div class="mt-4 pt-4 border-t border-gray-200"><p id="thaiText" class="text-sm text-gray-600">-</p></div>
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <p id="thaiText" class="text-sm text-gray-600 font-medium">-</p>
+            </div>
+
             <div id="vocabBox" class="mt-4 bg-yellow-50 rounded-xl p-4 border border-yellow-100 hidden text-left shadow-sm">
-            <h3 class="font-bold text-yellow-800 text-sm mb-2"><i class="fas fa-book-open mr-1"></i> คำศัพท์น่ารู้</h3>
-            <ul id="vocabList" class="text-xs text-gray-700 space-y-1.5 leading-relaxed">
-                </ul>
-        </div>
+                <h3 class="font-bold text-yellow-800 text-sm mb-2"><i class="fas fa-book-open mr-1"></i> คำศัพท์น่ารู้</h3>
+                <ul id="vocabList" class="text-xs text-gray-700 space-y-1.5 leading-relaxed">
+                    </ul>
+            </div>
         </div>
 
         <div class="flex justify-between items-center px-2">
@@ -81,8 +85,8 @@
   </div>
 
   <script>
-    // 🛑 นำ URL จาก Apps Script (ที่เพิ่งก๊อปปี้มาใหม่) มาวางตรงนี้ครับ 🛑
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbz-yYmzc5iKR1xN71JDB_SIa4XfHPzlnkji_7JSgR8jViBBS3AbS0rovdRMDxPss-GH3Q/exec"; 
+    // 🛑 นำ URL จาก Apps Script (ที่เพิ่งก๊อปปี้มาใหม่จากสเตป 1) มาวางตรงนี้ครับ 🛑
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxpDzVj_m7pfRnXz4mDEXpxBfMCaopWCetfOThbcCwi3PueBEkafvdBZvwwjBJ7pWhTKQ/exec"; 
 
     let allLessons = [];
     let currentCategoryLessons = [];
@@ -91,7 +95,6 @@
     let mediaRecorder;
     let audioChunks = [];
 
-    // โหลดข้อมูลเมื่อเปิดเว็บ
     window.onload = () => {
         fetch(GAS_URL)
             .then(res => res.json())
@@ -106,7 +109,6 @@
             });
     };
 
-    // จัดการหมวดหมู่
     function setupCategories() {
         const categories = [...new Set(allLessons.map(item => item.category))];
         const select = document.getElementById('categorySelect');
@@ -114,7 +116,7 @@
         categories.forEach(cat => {
             select.innerHTML += `<option value="${cat}">${cat}</option>`;
         });
-        changeCategory(); // โหลดหมวดแรก
+        changeCategory(); 
     }
 
     function changeCategory() {
@@ -132,7 +134,6 @@
         if (currentIndex < currentCategoryLessons.length - 1) { currentIndex++; updateUI(); }
     }
 
-    // อัปเดตหน้าจอ
     function updateUI() {
         const lesson = currentCategoryLessons[currentIndex];
         document.getElementById('categoryBadge').innerText = lesson.category;
@@ -149,11 +150,11 @@
             imgEl.classList.add('hidden');
         }
         
-        // 🔥 จัดการคำศัพท์ (ส่วนที่เพิ่มมาใหม่) 🔥
+        // จัดการคำศัพท์
         const vocabBox = document.getElementById('vocabBox');
         const vocabList = document.getElementById('vocabList');
         if (lesson.vocab && lesson.vocab.trim() !== "") {
-            const words = lesson.vocab.split('|'); // แยกคำด้วยเครื่องหมาย |
+            const words = lesson.vocab.split('|');
             vocabList.innerHTML = words.map(w => `<li class="border-b border-yellow-200/50 pb-1 last:border-0"><span class="text-yellow-600 mr-1">✨</span> ${w.trim()}</li>`).join('');
             vocabBox.classList.remove('hidden');
         } else {
@@ -165,7 +166,6 @@
         document.getElementById('resultBox').classList.add('hidden'); 
     }
 
-    // ระบบเสียงพูดและบันทึกเสียง (เหมือนเดิม)
     function playExampleAudio() {
       if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(document.getElementById('chineseText').innerText);
@@ -207,7 +207,7 @@
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onloadend = function() {
-        const currentTargetText = document.getElementById('chineseText').innerText; // ดึงประโยคเป้าหมายปัจจุบัน
+        const currentTargetText = document.getElementById('chineseText').innerText; 
         
         fetch(GAS_URL, {
           method: 'POST',
@@ -228,8 +228,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
