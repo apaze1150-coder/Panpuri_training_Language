@@ -173,12 +173,24 @@
             imgEl.classList.add('hidden');
         }
         
-        // จัดการคำศัพท์
+        // 🔥 จัดการคำศัพท์ (อัปเดตใหม่ ให้กดฟังเสียงได้) 🔥
         const vocabBox = document.getElementById('vocabBox');
         const vocabList = document.getElementById('vocabList');
         if (lesson.vocab && lesson.vocab.trim() !== "") {
             const words = lesson.vocab.split('|');
-            vocabList.innerHTML = words.map(w => `<li class="border-b border-yellow-200/50 pb-1 last:border-0"><span class="text-yellow-600 mr-1">✨</span> ${w.trim()}</li>`).join('');
+            
+            vocabList.innerHTML = words.map(w => {
+                const cleanWord = w.trim();
+                // ใช้เทคนิคตัดเอาเฉพาะตัวอักษรจีนที่อยู่หน้าวงเล็บ ( เพื่อส่งให้ AI อ่าน
+                const chineseOnly = cleanWord.split('(')[0].trim();
+                
+                // สร้างปุ่มให้กดได้ พร้อมเอฟเฟกต์ตอนเอาเมาส์ชี้ และไอคอนลำโพง
+                return `<li onclick="speakWord('${chineseOnly}')" class="border-b border-yellow-200/50 pb-2 pt-2 last:border-0 cursor-pointer hover:bg-yellow-100 transition-colors px-2 rounded-md flex items-center justify-between active:bg-yellow-200">
+                    <span><span class="text-yellow-600 mr-1">✨</span> ${cleanWord}</span>
+                    <i class="fas fa-volume-up text-yellow-500 text-xs opacity-70"></i>
+                </li>`;
+            }).join('');
+            
             vocabBox.classList.remove('hidden');
         } else {
             vocabBox.classList.add('hidden');
@@ -248,8 +260,19 @@
         .catch(error => { document.getElementById('statusMsg').innerText = "❌ ขัดข้อง: " + error.message; });
       };
     }
+    // ฟังก์ชันสำหรับอ่านออกเสียงคำศัพท์ทีละคำ
+    function speakWord(word) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // สั่งให้หยุดเสียงเก่าก่อน (ถ้ามี)
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'zh-CN'; 
+        utterance.rate = 0.75; // ปรับให้พูดช้าลงนิดนึงเพื่อให้ออกเสียงตามง่ายๆ
+        window.speechSynthesis.speak(utterance);
+      }
+    }
   </script>
 </body>
 </html>
+
 
 
