@@ -26,23 +26,37 @@
     </div>
 
     <div class="p-5 flex flex-col gap-4 flex-grow">
-        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center relative shadow-sm mt-2">
-            <span class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-black text-white text-[10px] px-3 py-1 rounded-full tracking-widest">หมวดน้ำหอม</span>
-            <p class="text-gray-400 text-xs mt-2">ประโยคเป้าหมาย:</p>
-            <h2 id="chineseText" class="text-2xl font-bold text-gray-900 mt-2 mb-1">这是我们最畅销的标志性香味。</h2>
-            <p class="text-gray-500 italic text-sm">(Zhè shì wǒmen zuì chàngxiāo de biāozhì xìng xiāngwèi.)</p>
-            <div class="mt-4 pt-4 border-t border-gray-200"><p class="text-sm text-gray-600">ความหมาย: นี่คือกลิ่นซิกเนเจอร์ที่ขายดีที่สุดของเรา</p></div>
+        
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-700">เลือกหมวดหมู่สินค้า:</label>
+            <select id="categorySelect" onchange="changeCategory()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5 shadow-sm">
+                <option value="">กำลังโหลดข้อมูล...</option>
+            </select>
         </div>
 
-        <div class="flex justify-center items-center gap-6 my-6">
+        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center relative shadow-sm mt-2">
+            <span id="categoryBadge" class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-black text-white text-[10px] px-3 py-1 rounded-full tracking-widest">-</span>
+            <p class="text-gray-400 text-xs mt-2">ประโยคเป้าหมาย:</p>
+            <h2 id="chineseText" class="text-2xl font-bold text-gray-900 mt-2 mb-1">กำลังโหลด...</h2>
+            <p id="pinyinText" class="text-gray-500 italic text-sm">-</p>
+            <div class="mt-4 pt-4 border-t border-gray-200"><p id="thaiText" class="text-sm text-gray-600">-</p></div>
+        </div>
+
+        <div class="flex justify-between items-center px-2">
+            <button onclick="prevLesson()" class="text-gray-600 bg-gray-100 hover:bg-gray-200 px-4 py-1.5 rounded-full text-xs font-bold transition"><i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า</button>
+            <span id="lessonCounter" class="text-xs text-gray-500 font-medium">0 / 0</span>
+            <button onclick="nextLesson()" class="text-gray-600 bg-gray-100 hover:bg-gray-200 px-4 py-1.5 rounded-full text-xs font-bold transition">ถัดไป <i class="fas fa-chevron-right ml-1"></i></button>
+        </div>
+
+        <div class="flex justify-center items-center gap-6 my-4">
             <button onclick="playExampleAudio()" class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shadow-sm border border-blue-100 hover:bg-blue-100 transition"><i class="fas fa-volume-up text-lg"></i></button>
-            <button id="recordBtn" onclick="startRecording()" class="w-16 h-16 rounded-full bg-gray-50 text-gray-700 flex items-center justify-center shadow-md border border-gray-200 hover:bg-gray-100 transition relative"><i class="fas fa-microphone text-2xl"></i></button>
+            <button id="recordBtn" onclick="startRecording()" class="w-16 h-16 rounded-full bg-gray-50 text-gray-700 flex items-center justify-center shadow-md border border-gray-200 hover:bg-gray-100 transition relative disabled:opacity-50" disabled><i class="fas fa-microphone text-2xl"></i></button>
             <button id="stopBtn" onclick="stopRecording()" class="w-12 h-12 rounded-full bg-red-50 text-red-400 flex items-center justify-center shadow-sm border border-red-100 hover:bg-red-100 transition opacity-50 cursor-not-allowed" disabled><i class="fas fa-paper-plane text-lg text-red-500"></i></button>
         </div>
 
-        <div id="statusMsg" class="text-center text-sm text-blue-600 h-6 font-medium animate-pulse"></div>
+        <div id="statusMsg" class="text-center text-sm text-blue-600 h-6 font-medium animate-pulse">กำลังซิงค์ข้อมูล...</div>
 
-        <div id="resultBox" class="hidden bg-green-50 rounded-2xl p-5 border border-green-100 shadow-sm transition-all">
+        <div id="resultBox" class="hidden bg-green-50 rounded-2xl p-5 border border-green-100 shadow-sm transition-all mb-4">
             <h3 class="font-bold text-green-800 border-b border-green-200 pb-2 mb-3"><i class="fas fa-check-circle mr-2"></i>ผลการประเมิน</h3>
             <div class="flex justify-between items-center mb-3">
                 <span class="text-gray-700 text-sm">คะแนน:</span>
@@ -61,17 +75,74 @@
   </div>
 
   <script>
-    // 🛑 เอา URL ที่คัดลอกจากขั้นตอนที่ 1 มาวางในเครื่องหมายคำพูดด้านล่างนี้ 🛑
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzvpSs-S46mIhmX2q7J9UyIuZNfnHgKxekVrnO5fjGVls8nC4KTWyagKTtxdBNlxPU9/exec"; 
+    // 🛑 นำ URL จาก Apps Script (ที่เพิ่งก๊อปปี้มาใหม่) มาวางตรงนี้ครับ 🛑
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwkG5qx9KjgYB5QBPInifu8TUQaZixSHNROp-sQU2RdYqJCoOOxrSIpY1oUPao-XPwR/exec"; 
 
+    let allLessons = [];
+    let currentCategoryLessons = [];
+    let currentIndex = 0;
+    
     let mediaRecorder;
     let audioChunks = [];
-    const targetSentence = "这是我们最畅销的标志性香味。";
 
+    // โหลดข้อมูลเมื่อเปิดเว็บ
+    window.onload = () => {
+        fetch(GAS_URL)
+            .then(res => res.json())
+            .then(data => {
+                if(data.error) throw new Error(data.error);
+                allLessons = data;
+                setupCategories();
+                document.getElementById('recordBtn').disabled = false;
+            })
+            .catch(err => {
+                document.getElementById('statusMsg').innerText = "❌ โหลดข้อมูลไม่สำเร็จ: " + err.message;
+            });
+    };
+
+    // จัดการหมวดหมู่
+    function setupCategories() {
+        const categories = [...new Set(allLessons.map(item => item.category))];
+        const select = document.getElementById('categorySelect');
+        select.innerHTML = '';
+        categories.forEach(cat => {
+            select.innerHTML += `<option value="${cat}">${cat}</option>`;
+        });
+        changeCategory(); // โหลดหมวดแรก
+    }
+
+    function changeCategory() {
+        const selectedCat = document.getElementById('categorySelect').value;
+        currentCategoryLessons = allLessons.filter(item => item.category === selectedCat);
+        currentIndex = 0;
+        updateUI();
+    }
+
+    function prevLesson() {
+        if (currentIndex > 0) { currentIndex--; updateUI(); }
+    }
+
+    function nextLesson() {
+        if (currentIndex < currentCategoryLessons.length - 1) { currentIndex++; updateUI(); }
+    }
+
+    // อัปเดตหน้าจอ
+    function updateUI() {
+        const lesson = currentCategoryLessons[currentIndex];
+        document.getElementById('categoryBadge').innerText = lesson.category;
+        document.getElementById('chineseText').innerText = lesson.chineseText;
+        document.getElementById('pinyinText').innerText = `(${lesson.pinyinText})`;
+        document.getElementById('thaiText').innerText = `ความหมาย: ${lesson.thaiText}`;
+        
+        document.getElementById('lessonCounter').innerText = `${currentIndex + 1} / ${currentCategoryLessons.length}`;
+        document.getElementById('statusMsg').innerText = "";
+        document.getElementById('resultBox').classList.add('hidden'); // ซ่อนผลคะแนนเก่า
+    }
+
+    // ระบบเสียงพูดและบันทึกเสียง (เหมือนเดิม)
     function playExampleAudio() {
       if ('speechSynthesis' in window) {
-        const textToRead = document.getElementById('chineseText').innerText;
-        const utterance = new SpeechSynthesisUtterance(textToRead);
+        const utterance = new SpeechSynthesisUtterance(document.getElementById('chineseText').innerText);
         utterance.lang = 'zh-CN'; utterance.rate = 0.8;
         window.speechSynthesis.speak(utterance);
       }
@@ -81,10 +152,9 @@
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-        mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = async () => {
-          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-          sendToAI(audioBlob);
+          sendToAI(new Blob(audioChunks, { type: 'audio/webm' }));
           audioChunks = []; 
         };
         mediaRecorder.start();
@@ -93,11 +163,9 @@
         document.getElementById('recordBtn').classList.add('mic-recording');
         document.getElementById('stopBtn').disabled = false;
         document.getElementById('stopBtn').classList.remove('opacity-50', 'cursor-not-allowed');
-        document.getElementById('statusMsg').innerText = "กำลังฟัง... พูดได้เลยครับ";
+        document.getElementById('statusMsg').innerText = "🎙️ กำลังฟัง... พูดได้เลยครับ";
         document.getElementById('resultBox').classList.add('hidden');
-      } catch (err) {
-        alert("กรุณาอนุญาตการใช้ไมโครโฟนในการตั้งค่าเบราว์เซอร์ครับ");
-      }
+      } catch (err) { alert("กรุณาอนุญาตการใช้ไมโครโฟนครับ"); }
     }
 
     function stopRecording() {
@@ -106,42 +174,31 @@
       document.getElementById('recordBtn').classList.remove('mic-recording');
       document.getElementById('stopBtn').disabled = true;
       document.getElementById('stopBtn').classList.add('opacity-50', 'cursor-not-allowed');
-      document.getElementById('statusMsg').innerText = "กำลังวิเคราะห์น้ำเสียง... รอสักครู่ ⏳";
+      document.getElementById('statusMsg').innerText = "⏳ กำลังวิเคราะห์น้ำเสียง... รอสักครู่";
     }
 
-    // ฟังก์ชันส่งข้อมูลด้วย fetch API แทน google.script.run
     function sendToAI(blob) {
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onloadend = function() {
-        const base64data = reader.result;
+        const currentTargetText = document.getElementById('chineseText').innerText; // ดึงประโยคเป้าหมายปัจจุบัน
         
         fetch(GAS_URL, {
           method: 'POST',
-          body: JSON.stringify({ audioBase64: base64data, targetSentence: targetSentence }),
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' } // ใช้ text/plain เลี่ยงปัญหา CORS
+          body: JSON.stringify({ audioBase64: reader.result, targetSentence: currentTargetText }),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
             document.getElementById('statusMsg').innerText = "";
             document.getElementById('resultBox').classList.remove('hidden');
             document.getElementById('scoreText').innerText = data.score || 0;
-            const wrongWords = (data.wrong_words && data.wrong_words.length > 0) ? data.wrong_words.join(", ") : "ไม่มี (เป๊ะมาก!)";
-            document.getElementById('wrongWordsText').innerText = wrongWords;
+            document.getElementById('wrongWordsText').innerText = (data.wrong_words && data.wrong_words.length > 0) ? data.wrong_words.join(", ") : "ไม่มี (เป๊ะมาก!)";
             document.getElementById('feedbackText').innerText = data.feedback || "พยายามต่อไปครับ!";
         })
-        .catch(error => {
-            document.getElementById('statusMsg').innerText = "❌ ขัดข้อง: " + error.message;
-        });
+        .catch(error => { document.getElementById('statusMsg').innerText = "❌ ขัดข้อง: " + error.message; });
       };
     }
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
