@@ -36,6 +36,9 @@
         <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center relative shadow-sm mt-2">
             <span id="categoryBadge" class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-black text-white text-[10px] px-3 py-1 rounded-full tracking-widest">-</span>
             <p id="scentText" class="text-sm font-semibold text-gray-500 tracking-wide mt-3 mb-1 hidden"></p>
+            <div id="keyNoteBox" class="mt-1 mb-2 hidden">
+                <span id="keyNoteText" class="bg-gray-200 text-gray-600 text-[11px] font-medium px-2.5 py-1 rounded-full"></span>
+            </div>
             
             <img id="productImage" src="" alt="Product Image" class="w-32 h-32 object-contain mx-auto rounded-lg mb-3 hidden shadow-sm border border-gray-200 p-1 bg-white">
             
@@ -87,7 +90,7 @@
 
   <script>
     // 🛑 นำ URL จาก Apps Script (ที่เพิ่งก๊อปปี้มาใหม่จากสเตป 1) มาวางตรงนี้ครับ 🛑
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzOCBBgA-zxRcX4gsQJJIPupAamqZjGywy_jh3Ovl_qkxlfDvwf7O9KLWeUgfH5ekIb_w/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyBPLV-tK7HpY9Sb8ZL7-lcCs2Rdqx4GazEITK9qFO3FRWjRdm3kK_j4KcEHvvqRXhf2w/exec"; 
 
     let allLessons = [];
     let currentCategoryLessons = [];
@@ -138,14 +141,23 @@
     function updateUI() {
         const lesson = currentCategoryLessons[currentIndex];
         document.getElementById('categoryBadge').innerText = lesson.category;
-        
-        // 🔥 จัดการชื่อกลิ่น Scent (ส่วนที่เพิ่มมาใหม่) 🔥
+       // จัดการชื่อกลิ่น Scent
         const scentEl = document.getElementById('scentText');
         if (lesson.scent && lesson.scent.trim() !== "") {
             scentEl.innerText = "Scent: " + lesson.scent;
             scentEl.classList.remove('hidden');
         } else {
             scentEl.classList.add('hidden');
+        }
+
+        // 🔥 จัดการ KeyNote (ส่วนที่เพิ่มมาใหม่) 🔥
+        const keyNoteBox = document.getElementById('keyNoteBox');
+        const keyNoteText = document.getElementById('keyNoteText');
+        if (lesson.keyNote && lesson.keyNote.trim() !== "") {
+            keyNoteText.innerText = "Key Note: " + lesson.keyNote;
+            keyNoteBox.classList.remove('hidden'); // โชว์ถ้ามีข้อมูล
+        } else {
+            keyNoteBox.classList.add('hidden'); // ซ่อนเนียนๆ ถ้าช่องว่างเปล่า
         }
 
         document.getElementById('chineseText').innerText = lesson.chineseText;
@@ -239,4 +251,5 @@
   </script>
 </body>
 </html>
+
 
