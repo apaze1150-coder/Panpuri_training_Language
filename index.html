@@ -36,10 +36,16 @@
 
         <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center relative shadow-sm mt-2">
             <span id="categoryBadge" class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-black text-white text-[10px] px-3 py-1 rounded-full tracking-widest">-</span>
+            <img id="productImage" src="" alt="Product Image" class="w-32 h-32 object-contain mx-auto rounded-lg mb-3 hidden shadow-sm border border-gray-100 p-1">
             <p class="text-gray-400 text-xs mt-2">ประโยคเป้าหมาย:</p>
             <h2 id="chineseText" class="text-2xl font-bold text-gray-900 mt-2 mb-1">กำลังโหลด...</h2>
             <p id="pinyinText" class="text-gray-500 italic text-sm">-</p>
             <div class="mt-4 pt-4 border-t border-gray-200"><p id="thaiText" class="text-sm text-gray-600">-</p></div>
+            <div id="vocabBox" class="mt-4 bg-yellow-50 rounded-xl p-4 border border-yellow-100 hidden text-left shadow-sm">
+            <h3 class="font-bold text-yellow-800 text-sm mb-2"><i class="fas fa-book-open mr-1"></i> คำศัพท์น่ารู้</h3>
+            <ul id="vocabList" class="text-xs text-gray-700 space-y-1.5 leading-relaxed">
+                </ul>
+        </div>
         </div>
 
         <div class="flex justify-between items-center px-2">
@@ -76,7 +82,7 @@
 
   <script>
     // 🛑 นำ URL จาก Apps Script (ที่เพิ่งก๊อปปี้มาใหม่) มาวางตรงนี้ครับ 🛑
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbx_t1D51l8u39kFCTpozuswh72UYuva22rVGdlZ2vn7jhRs1nznl0z2GX5YcZgELvR6/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxKZqvEyIWN7XB1BRLLZmMl_hdRtnY9OfUIeZAg9iZ3DiDmNQ4TciI0l1ccKgx9abAfbA/exec"; 
 
     let allLessons = [];
     let currentCategoryLessons = [];
@@ -134,9 +140,29 @@
         document.getElementById('pinyinText').innerText = `(${lesson.pinyinText})`;
         document.getElementById('thaiText').innerText = `ความหมาย: ${lesson.thaiText}`;
         
+        // จัดการรูปภาพ
+        const imgEl = document.getElementById('productImage');
+        if (lesson.imageUrl && lesson.imageUrl.trim() !== "") {
+            imgEl.src = lesson.imageUrl;
+            imgEl.classList.remove('hidden');
+        } else {
+            imgEl.classList.add('hidden');
+        }
+        
+        // 🔥 จัดการคำศัพท์ (ส่วนที่เพิ่มมาใหม่) 🔥
+        const vocabBox = document.getElementById('vocabBox');
+        const vocabList = document.getElementById('vocabList');
+        if (lesson.vocab && lesson.vocab.trim() !== "") {
+            const words = lesson.vocab.split('|'); // แยกคำด้วยเครื่องหมาย |
+            vocabList.innerHTML = words.map(w => `<li class="border-b border-yellow-200/50 pb-1 last:border-0"><span class="text-yellow-600 mr-1">✨</span> ${w.trim()}</li>`).join('');
+            vocabBox.classList.remove('hidden');
+        } else {
+            vocabBox.classList.add('hidden');
+        }
+        
         document.getElementById('lessonCounter').innerText = `${currentIndex + 1} / ${currentCategoryLessons.length}`;
         document.getElementById('statusMsg').innerText = "";
-        document.getElementById('resultBox').classList.add('hidden'); // ซ่อนผลคะแนนเก่า
+        document.getElementById('resultBox').classList.add('hidden'); 
     }
 
     // ระบบเสียงพูดและบันทึกเสียง (เหมือนเดิม)
@@ -202,6 +228,7 @@
   </script>
 </body>
 </html>
+
 
 
 
