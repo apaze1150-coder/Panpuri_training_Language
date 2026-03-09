@@ -161,15 +161,8 @@ function updateUI() {
         } else {
             scentEl.classList.add('hidden');
         }
-        // 🔥 จัดการเช็คสถานะหัวใจ 🔥
-        const favs = JSON.parse(localStorage.getItem('panpuri_favs')) || [];
-        const isFav = favs.some(f => f.chineseText === lesson.chineseText);
-        if (isFav) {
-            document.getElementById('favIcon').className = "fas fa-heart text-red-500"; // แดง
-        } else {
-            document.getElementById('favIcon').className = "far fa-heart text-gray-300"; // กลวงเทา
-        }
-        // 🔥 จัดการ KeyNote
+
+        // จัดการ KeyNote
         const keyNoteBox = document.getElementById('keyNoteBox');
         const keyNoteText = document.getElementById('keyNoteText');
         if (lesson.keyNote && lesson.keyNote.trim() !== "") {
@@ -179,10 +172,22 @@ function updateUI() {
             keyNoteBox.classList.add('hidden'); 
         }
 
+        // 🔥 จัดการเช็คสถานะหัวใจ (สีแดง/สีเทา) 🔥
+        const favs = JSON.parse(localStorage.getItem('panpuri_favs')) || [];
+        const isFav = favs.some(f => f.chineseText === lesson.chineseText);
+        const favIcon = document.getElementById('favIcon');
+        if (favIcon) {
+            if (isFav) {
+                favIcon.className = "fas fa-heart text-red-500"; // แดง
+            } else {
+                favIcon.className = "far fa-heart text-gray-300"; // กลวงเทา
+            }
+        }
+
         document.getElementById('chineseText').innerText = lesson.chineseText;
         document.getElementById('pinyinText').innerText = `(${lesson.pinyinText})`;
         
-        // 🔥 จัดการคำแปลภาษาไทย (เพิ่มเข้ามาใหม่ตรงนี้ครับ) 🔥
+        // จัดการคำแปลภาษาไทย 
         const thaiTextBox = document.getElementById('thaiTextBox');
         const thaiTextEl = document.getElementById('thaiText');
         if (lesson.thaiText && lesson.thaiText.trim() !== "" && lesson.thaiText.trim() !== "-") {
@@ -201,7 +206,7 @@ function updateUI() {
             imgEl.classList.add('hidden');
         }
         
-        // 🔥 จัดการคำศัพท์ (อัปเดตใหม่ ให้กดฟังเสียงได้) 
+        // จัดการคำศัพท์ (ให้กดฟังเสียงได้) 
         const vocabBox = document.getElementById('vocabBox');
         const vocabList = document.getElementById('vocabList');
         if (lesson.vocab && lesson.vocab.trim() !== "") {
@@ -295,9 +300,48 @@ function updateUI() {
         window.speechSynthesis.speak(utterance);
       }
     }
+    // 1. ฟังก์ชันดึงรายการโปรดจากความจำมือถือ
+    function getFavorites() {
+        return JSON.parse(localStorage.getItem('panpuri_favs')) || [];
+    }
+
+    // 2. ฟังก์ชันกดหัวใจ (เซฟ/ลบ ข้อมูล)
+    function toggleFavorite() {
+        const lesson = currentCategoryLessons[currentIndex];
+        let favs = getFavorites();
+        
+        // เช็คว่าเคยเซฟประโยคนี้ไว้หรือยัง
+        const existingIndex = favs.findIndex(f => f.chineseText === lesson.chineseText);
+        
+        if (existingIndex > -1) {
+            // ถ้ามีแล้ว = กดเพื่อเอาออก (Unlike)
+            favs.splice(existingIndex, 1); 
+            document.getElementById('favIcon').className = "far fa-heart text-gray-300"; // เปลี่ยนเป็นหัวใจกลวง
+        } else {
+            // ถ้ายังไม่มี = กดเพื่อบันทึก (Like)
+            favs.push(lesson); 
+            document.getElementById('favIcon').className = "fas fa-heart text-red-500"; // เปลี่ยนเป็นหัวใจสีแดง
+        }
+        localStorage.setItem('panpuri_favs', JSON.stringify(favs)); // สั่งเซฟลงเครื่อง
+    }
+
+    // 3. ฟังก์ชันเปิดโหมดทบทวน
+    function loadFavoritesMode() {
+        const favs = getFavorites();
+        if (favs.length === 0) {
+            alert("คุณยังไม่มีรายการโปรดเลยครับ ลองกดหัวใจที่มุมขวาบน 🤍 เพื่อเก็บประโยคไว้ท่องดูนะครับ!");
+            return;
+        }
+        // เอารายการโปรดในเครื่อง มาแทนที่เนื้อหาปัจจุบัน
+        currentCategoryLessons = favs;
+        currentIndex = 0;
+        updateUI();
+        document.getElementById('categoryBadge').innerText = "⭐ FAVORITES"; // เปลี่ยนป้ายชื่อ
+    }
   </script>
 </body>
 </html>
+
 
 
 
