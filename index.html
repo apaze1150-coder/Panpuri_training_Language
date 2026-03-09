@@ -27,6 +27,11 @@
 
     <div class="p-5 flex flex-col gap-4 flex-grow">
         <div>
+            <div class="text-center mt-2 mb-4">
+        <button onclick="loadFavoritesMode()" class="bg-red-50 text-red-600 border border-red-200 text-sm font-medium px-4 py-2 rounded-full shadow-sm hover:bg-red-100 transition-colors">
+            ❤️ ทบทวนรายการโปรดของฉัน
+        </button>
+    </div>
             <label class="block mb-2 text-sm font-medium text-gray-700">เลือกหมวดหมู่สินค้า:</label>
             <select id="categorySelect" onchange="changeCategory()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5 shadow-sm">
                 <option value="">กำลังโหลดข้อมูล...</option>
@@ -35,6 +40,11 @@
 
         <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center relative shadow-sm mt-2">
             <span id="categoryBadge" class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-black text-white text-[10px] px-3 py-1 rounded-full tracking-widest">-</span>
+            
+            <button onclick="toggleFavorite()" class="absolute top-3 right-4 text-2xl outline-none focus:outline-none transition-transform active:scale-90 z-10 hover:scale-110">
+                <i id="favIcon" class="far fa-heart text-gray-300"></i>
+            </button>
+
             <p id="scentText" class="text-sm font-semibold text-gray-500 tracking-wide mt-3 mb-1 hidden"></p>
             <div id="keyNoteBox" class="mt-1 mb-2 hidden">
                 <span id="keyNoteText" class="bg-gray-200 text-gray-600 text-[11px] font-medium px-2.5 py-1 rounded-full"></span>
@@ -151,7 +161,14 @@ function updateUI() {
         } else {
             scentEl.classList.add('hidden');
         }
-
+        // 🔥 จัดการเช็คสถานะหัวใจ 🔥
+        const favs = JSON.parse(localStorage.getItem('panpuri_favs')) || [];
+        const isFav = favs.some(f => f.chineseText === lesson.chineseText);
+        if (isFav) {
+            document.getElementById('favIcon').className = "fas fa-heart text-red-500"; // แดง
+        } else {
+            document.getElementById('favIcon').className = "far fa-heart text-gray-300"; // กลวงเทา
+        }
         // 🔥 จัดการ KeyNote
         const keyNoteBox = document.getElementById('keyNoteBox');
         const keyNoteText = document.getElementById('keyNoteText');
@@ -281,6 +298,7 @@ function updateUI() {
   </script>
 </body>
 </html>
+
 
 
 
