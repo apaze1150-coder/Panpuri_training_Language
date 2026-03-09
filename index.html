@@ -24,15 +24,15 @@
             </div>
         </div>
     </div>
-            <div class="flex flex-wrap justify-center items-center gap-2 mt-2 mb-4">
-        <button onclick="loadFavoritesMode()" class="bg-red-50 text-red-600 border border-red-200 text-sm font-medium px-4 py-2 rounded-full shadow-sm hover:bg-red-100 transition-colors">
-            ❤️ ทบทวนรายการโปรด
-        </button>
+
+    <div class="p-5 flex flex-col gap-4 flex-grow">
         
-        <button id="toggleVoiceBtn" onclick="toggleAIVoice()" class="bg-gray-50 text-gray-600 border border-gray-200 text-sm font-medium px-4 py-2 rounded-full shadow-sm hover:bg-gray-100 transition-colors">
-            <i id="voiceIcon" class="fas fa-volume-up text-green-500 mr-1"></i> <span id="voiceText">เสียง AI: เปิด</span>
-        </button>
-    </div>
+        <div>
+            <div class="text-center mt-2 mb-4">
+                <button onclick="loadFavoritesMode()" class="bg-red-50 text-red-600 border border-red-200 text-sm font-medium px-4 py-2 rounded-full shadow-sm hover:bg-red-100 transition-colors">
+                    ❤️ ทบทวนรายการโปรดของฉัน
+                </button>
+            </div>
     
             <label class="block mb-2 text-sm font-medium text-gray-700">เลือกหมวดหมู่สินค้า:</label>
             <select id="categorySelect" onchange="changeCategory()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5 shadow-sm">
@@ -52,7 +52,7 @@
                 <span id="keyNoteText" class="bg-gray-200 text-gray-600 text-[11px] font-medium px-2.5 py-1 rounded-full"></span>
             </div>
             
-          <img id="productImage" src="" alt="Product Image" class="w-48 h-48 object-contain mx-auto rounded-lg mb-3 hidden shadow-sm border border-gray-200 p-1 bg-white">
+            <img id="productImage" src="" alt="Product Image" class="w-48 h-48 object-contain mx-auto rounded-lg mt-3 mb-3 hidden shadow-sm border border-gray-200 p-1 bg-white">            
             
             <p class="text-gray-400 text-xs mt-2">ประโยคเป้าหมาย:</p>
             <h2 id="chineseText" class="text-2xl font-bold text-gray-900 mt-2 mb-1">กำลังโหลด...</h2>
@@ -65,7 +65,7 @@
             <div id="vocabBox" class="mt-4 bg-yellow-50 rounded-xl p-4 border border-yellow-100 hidden text-left shadow-sm">
                 <h3 class="font-bold text-yellow-800 text-sm mb-2"><i class="fas fa-book-open mr-1"></i> คำศัพท์น่ารู้</h3>
                 <ul id="vocabList" class="text-xs text-gray-700 space-y-1.5 leading-relaxed">
-                    </ul>
+                </ul>
             </div>
         </div>
 
@@ -84,7 +84,14 @@
         <div id="statusMsg" class="text-center text-sm text-blue-600 h-6 font-medium animate-pulse">กำลังซิงค์ข้อมูล...</div>
 
         <div id="resultBox" class="hidden bg-green-50 rounded-2xl p-5 border border-green-100 shadow-sm transition-all mb-4">
-            <h3 class="font-bold text-green-800 border-b border-green-200 pb-2 mb-3"><i class="fas fa-check-circle mr-2"></i>ผลการประเมิน</h3>
+            <div class="flex justify-between items-center border-b border-green-200 pb-2 mb-3">
+                <h3 class="font-bold text-green-800"><i class="fas fa-check-circle mr-2"></i>ผลการประเมิน</h3>
+                
+                <button id="toggleVoiceBtn" onclick="toggleAIVoice()" class="bg-white text-gray-600 border border-gray-200 text-xs font-medium px-3 py-1 rounded-full shadow-sm hover:bg-gray-50 transition-colors flex items-center">
+                    <i id="voiceIcon" class="fas fa-volume-up text-green-500 mr-1"></i> <span id="voiceText" class="ml-1">เสียง AI: เปิด</span>
+                </button>
+            </div>
+            
             <div class="flex justify-between items-center mb-3">
                 <span class="text-gray-700 text-sm">คะแนน:</span>
                 <span class="text-3xl font-bold text-green-600"><span id="scoreText">0</span><span class="text-sm text-green-500">/100</span></span>
@@ -98,9 +105,9 @@
                 <p id="feedbackText" class="text-gray-800 text-sm bg-white p-3 rounded-lg border border-green-100 shadow-sm"></p>
             </div>
         </div>
+
     </div>
   </div>
-
   <script>
     // 🛑 นำ URL จาก Apps Script (ที่เพิ่งก๊อปปี้มาใหม่จากสเตป 1) มาวางตรงนี้ครับ 🛑
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzj5szbg3M8CO7PGrCa2Zz8M5TlOfmELrOYZXtZOaTgMhLoVzGApNk1_afHYYk2hVDHag/exec"; 
@@ -403,6 +410,7 @@ function updateUI() {
   </script>
 </body>
 </html>
+
 
 
 
