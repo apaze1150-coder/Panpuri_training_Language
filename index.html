@@ -286,7 +286,7 @@ function updateUI() {
       document.getElementById('statusMsg').innerText = "⏳ กำลังวิเคราะห์น้ำเสียง... รอสักครู่";
     }
 
-    function sendToAI(blob) {
+   function sendToAI(blob) {
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onloadend = function() {
@@ -303,7 +303,12 @@ function updateUI() {
             document.getElementById('resultBox').classList.remove('hidden');
             document.getElementById('scoreText').innerText = data.score || 0;
             document.getElementById('wrongWordsText').innerText = (data.wrong_words && data.wrong_words.length > 0) ? data.wrong_words.join(", ") : "ไม่มี (เป๊ะมาก!)";
-            document.getElementById('feedbackText').innerText = data.feedback || "พยายามต่อไปครับ!";
+            
+            const aiMessage = data.feedback || "พยายามต่อไปครับ!";
+            document.getElementById('feedbackText').innerText = aiMessage;
+            
+            // 🔥 สั่งให้อ่านออกเสียงข้อความฟีดแบ็กทันทีที่แสดงผล 🔥
+            speakAIFeedback(aiMessage);
         })
         .catch(error => { document.getElementById('statusMsg').innerText = "❌ ขัดข้อง: " + error.message; });
       };
@@ -356,9 +361,21 @@ function updateUI() {
         updateUI();
         document.getElementById('categoryBadge').innerText = "⭐ FAVORITES"; // เปลี่ยนป้ายชื่อ
     }
+    // 4. ฟังก์ชันให้อ่านออกเสียงคำแนะนำจาก AI (ภาษาไทย)
+    function speakAIFeedback(feedbackText) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); // หยุดเสียงเก่าที่อาจจะค้างอยู่ก่อน
+            const utterance = new SpeechSynthesisUtterance(feedbackText);
+            utterance.lang = 'th-TH'; // บังคับให้อ่านเป็นเสียงภาษาไทย
+            utterance.rate = 1.0;     // ความเร็วปกติ (ถ้าอยากให้พูดช้าลง ปรับเป็น 0.9 ได้ครับ)
+            utterance.pitch = 1.0;    // ระดับเสียง
+            window.speechSynthesis.speak(utterance);
+        }
+    }
   </script>
 </body>
 </html>
+
 
 
 
