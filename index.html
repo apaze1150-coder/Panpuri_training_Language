@@ -40,13 +40,14 @@
                 <span id="keyNoteText" class="bg-gray-200 text-gray-600 text-[11px] font-medium px-2.5 py-1 rounded-full"></span>
             </div>
             
-            <img id="productImage" src="" alt="Product Image" class="w-32 h-32 object-contain mx-auto rounded-lg mb-3 hidden shadow-sm border border-gray-200 p-1 bg-white">
+          <img id="productImage" src="" alt="Product Image" class="w-48 h-48 object-contain mx-auto rounded-lg mb-3 hidden shadow-sm border border-gray-200 p-1 bg-white">
             
             <p class="text-gray-400 text-xs mt-2">ประโยคเป้าหมาย:</p>
             <h2 id="chineseText" class="text-2xl font-bold text-gray-900 mt-2 mb-1">กำลังโหลด...</h2>
             <p id="pinyinText" class="text-gray-500 italic text-sm">-</p>
-            <div class="mt-4 pt-4 border-t border-gray-200">
-                <p id="thaiText" class="text-sm text-gray-600 font-medium">-</p>
+            
+            <div id="thaiTextBox" class="mt-4 pt-4 border-t border-gray-200 hidden">
+                <p id="thaiText" class="text-sm text-gray-700 font-medium"></p>
             </div>
 
             <div id="vocabBox" class="mt-4 bg-yellow-50 rounded-xl p-4 border border-yellow-100 hidden text-left shadow-sm">
@@ -90,7 +91,7 @@
 
   <script>
     // 🛑 นำ URL จาก Apps Script (ที่เพิ่งก๊อปปี้มาใหม่จากสเตป 1) มาวางตรงนี้ครับ 🛑
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyBPLV-tK7HpY9Sb8ZL7-lcCs2Rdqx4GazEITK9qFO3FRWjRdm3kK_j4KcEHvvqRXhf2w/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzj5szbg3M8CO7PGrCa2Zz8M5TlOfmELrOYZXtZOaTgMhLoVzGApNk1_afHYYk2hVDHag/exec"; 
 
     let allLessons = [];
     let currentCategoryLessons = [];
@@ -138,10 +139,11 @@
         if (currentIndex < currentCategoryLessons.length - 1) { currentIndex++; updateUI(); }
     }
 
-    function updateUI() {
+function updateUI() {
         const lesson = currentCategoryLessons[currentIndex];
         document.getElementById('categoryBadge').innerText = lesson.category;
-       // จัดการชื่อกลิ่น Scent
+        
+        // จัดการชื่อกลิ่น Scent
         const scentEl = document.getElementById('scentText');
         if (lesson.scent && lesson.scent.trim() !== "") {
             scentEl.innerText = "Scent: " + lesson.scent;
@@ -150,19 +152,28 @@
             scentEl.classList.add('hidden');
         }
 
-        // 🔥 จัดการ KeyNote (ส่วนที่เพิ่มมาใหม่) 🔥
+        // 🔥 จัดการ KeyNote
         const keyNoteBox = document.getElementById('keyNoteBox');
         const keyNoteText = document.getElementById('keyNoteText');
         if (lesson.keyNote && lesson.keyNote.trim() !== "") {
             keyNoteText.innerText = "Key Note: " + lesson.keyNote;
-            keyNoteBox.classList.remove('hidden'); // โชว์ถ้ามีข้อมูล
+            keyNoteBox.classList.remove('hidden'); 
         } else {
-            keyNoteBox.classList.add('hidden'); // ซ่อนเนียนๆ ถ้าช่องว่างเปล่า
+            keyNoteBox.classList.add('hidden'); 
         }
 
         document.getElementById('chineseText').innerText = lesson.chineseText;
         document.getElementById('pinyinText').innerText = `(${lesson.pinyinText})`;
-        // ... โค้ดส่วนจัดการรูปภาพและคำศัพท์อื่นๆ ปล่อยไว้เหมือนเดิมครับ ...
+        
+        // 🔥 จัดการคำแปลภาษาไทย (เพิ่มเข้ามาใหม่ตรงนี้ครับ) 🔥
+        const thaiTextBox = document.getElementById('thaiTextBox');
+        const thaiTextEl = document.getElementById('thaiText');
+        if (lesson.thaiText && lesson.thaiText.trim() !== "" && lesson.thaiText.trim() !== "-") {
+            thaiTextEl.innerText = lesson.thaiText; 
+            thaiTextBox.classList.remove('hidden');
+        } else {
+            thaiTextBox.classList.add('hidden');
+        }
         
         // จัดการรูปภาพ
         const imgEl = document.getElementById('productImage');
@@ -173,7 +184,7 @@
             imgEl.classList.add('hidden');
         }
         
-        // 🔥 จัดการคำศัพท์ (อัปเดตใหม่ ให้กดฟังเสียงได้) 🔥
+        // 🔥 จัดการคำศัพท์ (อัปเดตใหม่ ให้กดฟังเสียงได้) 
         const vocabBox = document.getElementById('vocabBox');
         const vocabList = document.getElementById('vocabList');
         if (lesson.vocab && lesson.vocab.trim() !== "") {
@@ -181,10 +192,8 @@
             
             vocabList.innerHTML = words.map(w => {
                 const cleanWord = w.trim();
-                // ใช้เทคนิคตัดเอาเฉพาะตัวอักษรจีนที่อยู่หน้าวงเล็บ ( เพื่อส่งให้ AI อ่าน
                 const chineseOnly = cleanWord.split('(')[0].trim();
                 
-                // สร้างปุ่มให้กดได้ พร้อมเอฟเฟกต์ตอนเอาเมาส์ชี้ และไอคอนลำโพง
                 return `<li onclick="speakWord('${chineseOnly}')" class="border-b border-yellow-200/50 pb-2 pt-2 last:border-0 cursor-pointer hover:bg-yellow-100 transition-colors px-2 rounded-md flex items-center justify-between active:bg-yellow-200">
                     <span><span class="text-yellow-600 mr-1">✨</span> ${cleanWord}</span>
                     <i class="fas fa-volume-up text-yellow-500 text-xs opacity-70"></i>
@@ -200,7 +209,6 @@
         document.getElementById('statusMsg').innerText = "";
         document.getElementById('resultBox').classList.add('hidden'); 
     }
-
     function playExampleAudio() {
       if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(document.getElementById('chineseText').innerText);
@@ -273,6 +281,7 @@
   </script>
 </body>
 </html>
+
 
 
 
