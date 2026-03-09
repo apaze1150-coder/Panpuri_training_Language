@@ -165,8 +165,26 @@ function updateUI() {
         // จัดการ KeyNote
         const keyNoteBox = document.getElementById('keyNoteBox');
         const keyNoteText = document.getElementById('keyNoteText');
+        
         if (lesson.keyNote && lesson.keyNote.trim() !== "") {
-            keyNoteText.innerText = "Key Note: " + lesson.keyNote;
+            const note = lesson.keyNote.trim();
+            
+            // ตรวจสอบว่าข้อความในช่อง KeyNote เป็นป้ายบอกประเภท หรือเป็นชื่อกลิ่น
+            if (note.includes('วิธีใช้')) {
+                keyNoteText.innerText = note; // ไม่ใส่คำว่า Key Note:
+                keyNoteText.className = "bg-emerald-50 text-emerald-600 border border-emerald-200 text-[11px] font-bold px-3 py-1 rounded-full tracking-wide shadow-sm";
+            } else if (note.includes('จุดเด่น')) {
+                keyNoteText.innerText = note; // ไม่ใส่คำว่า Key Note:
+                keyNoteText.className = "bg-sky-50 text-sky-600 border border-sky-200 text-[11px] font-bold px-3 py-1 rounded-full tracking-wide shadow-sm";
+            } else if (note.includes('แนะนำสินค้า')) {
+                keyNoteText.innerText = note; // ไม่ใส่คำว่า Key Note:
+                keyNoteText.className = "bg-purple-50 text-purple-600 border border-purple-200 text-[11px] font-bold px-3 py-1 rounded-full tracking-wide shadow-sm";
+            } else {
+                // ถ้าเป็นชื่อกลิ่น/ส่วนผสม (เช่น Thai Jasmine & Mint) ให้เติมคำว่า Key Note: 
+                keyNoteText.innerText = "Key Note: " + note;
+                keyNoteText.className = "bg-gray-100 text-gray-700 border border-gray-200 text-[11px] font-medium px-3 py-1 rounded-full shadow-sm";
+            }
+            
             keyNoteBox.classList.remove('hidden'); 
         } else {
             keyNoteBox.classList.add('hidden'); 
@@ -341,6 +359,7 @@ function updateUI() {
   </script>
 </body>
 </html>
+
 
 
 
