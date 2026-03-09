@@ -24,14 +24,16 @@
             </div>
         </div>
     </div>
-
-    <div class="p-5 flex flex-col gap-4 flex-grow">
-        <div>
-            <div class="text-center mt-2 mb-4">
+            <div class="flex flex-wrap justify-center items-center gap-2 mt-2 mb-4">
         <button onclick="loadFavoritesMode()" class="bg-red-50 text-red-600 border border-red-200 text-sm font-medium px-4 py-2 rounded-full shadow-sm hover:bg-red-100 transition-colors">
-            ❤️ ทบทวนรายการโปรดของฉัน
+            ❤️ ทบทวนรายการโปรด
+        </button>
+        
+        <button id="toggleVoiceBtn" onclick="toggleAIVoice()" class="bg-gray-50 text-gray-600 border border-gray-200 text-sm font-medium px-4 py-2 rounded-full shadow-sm hover:bg-gray-100 transition-colors">
+            <i id="voiceIcon" class="fas fa-volume-up text-green-500 mr-1"></i> <span id="voiceText">เสียง AI: เปิด</span>
         </button>
     </div>
+    
             <label class="block mb-2 text-sm font-medium text-gray-700">เลือกหมวดหมู่สินค้า:</label>
             <select id="categorySelect" onchange="changeCategory()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5 shadow-sm">
                 <option value="">กำลังโหลดข้อมูล...</option>
@@ -361,20 +363,47 @@ function updateUI() {
         updateUI();
         document.getElementById('categoryBadge').innerText = "⭐ FAVORITES"; // เปลี่ยนป้ายชื่อ
     }
-    // 4. ฟังก์ชันให้อ่านออกเสียงคำแนะนำจาก AI (ภาษาไทย)
+    // ตัวแปรความจำว่า ตอนนี้ผู้ใช้เปิดหรือปิดเสียง AI อยู่ (เริ่มต้นให้เปิดไว้)
+    let isAIVoiceEnabled = true;
+
+    // ฟังก์ชันสำหรับกดปุ่มสลับเปิด/ปิดเสียง
+    function toggleAIVoice() {
+        isAIVoiceEnabled = !isAIVoiceEnabled; // สลับค่าไปมา
+        const icon = document.getElementById('voiceIcon');
+        const text = document.getElementById('voiceText');
+        
+        if (isAIVoiceEnabled) {
+            // ถ้าเปิดเสียง: ไอคอนสีเขียว
+            icon.className = "fas fa-volume-up text-green-500 mr-1";
+            text.innerText = "เสียง AI: เปิด";
+        } else {
+            // ถ้าปิดเสียง: ไอคอนสีเทา และสั่งให้หยุดพูดทันที
+            icon.className = "fas fa-volume-mute text-gray-400 mr-1";
+            text.innerText = "เสียง AI: ปิด";
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+            }
+        }
+    }
+
+    // 4. ฟังก์ชันให้อ่านออกเสียงคำแนะนำจาก AI (อัปเดตใหม่)
     function speakAIFeedback(feedbackText) {
+        // 🔥 เช็คก่อนว่าระบบเสียงเปิดอยู่ไหม ถ้าปิดอยู่ให้ข้ามไปเลย ไม่ต้องพูด 🔥
+        if (!isAIVoiceEnabled) return; 
+
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel(); // หยุดเสียงเก่าที่อาจจะค้างอยู่ก่อน
             const utterance = new SpeechSynthesisUtterance(feedbackText);
             utterance.lang = 'th-TH'; // บังคับให้อ่านเป็นเสียงภาษาไทย
-            utterance.rate = 1.0;     // ความเร็วปกติ (ถ้าอยากให้พูดช้าลง ปรับเป็น 0.9 ได้ครับ)
-            utterance.pitch = 1.0;    // ระดับเสียง
+            utterance.rate = 1.0;     
+            utterance.pitch = 1.0;    
             window.speechSynthesis.speak(utterance);
         }
     }
   </script>
 </body>
 </html>
+
 
 
 
