@@ -8,37 +8,30 @@
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    body { font-family: 'Prompt', 'Noto Sans SC', sans-serif; background-color: #f8fafc; }
+    body { font-family: 'Prompt', 'Noto Sans SC', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
     .mic-recording { animation: pulse 1.5s infinite; background-color: #ef4444 !important; color: white !important; border-color: #ef4444 !important; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-    /* Animation สำหรับสไลด์ไปหน้าถัดไป */
-.slide-next-enter {
-  animation: slideNext 0.4s ease-out;
-}
+    
+    /* Animation สำหรับสไลด์ */
+    .slide-next-enter { animation: slideNext 0.4s ease-out; }
+    .slide-prev-enter { animation: slidePrev 0.4s ease-out; }
 
-/* Animation สำหรับสไลด์ย้อนกลับ */
-.slide-prev-enter {
-  animation: slidePrev 0.4s ease-out;
-}
+    @keyframes slideNext {
+      from { transform: translateX(50px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
 
-@keyframes slideNext {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
+    @keyframes slidePrev {
+      from { transform: translateX(-50px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
 
-@keyframes slidePrev {
-  from { transform: translateX(-100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-/* ทำให้ Container หลักมีการเปลี่ยนที่นุ่มนวล */
-#app-container {
-  transition: transform 0.3s ease;
-}
+    /* ป้องกันการเลือกข้อความขณะสไลด์บนมือถือ */
+    .no-select { -webkit-user-select: none; user-select: none; }
   </style>
 </head>
 <body>
-  <div class="max-w-md mx-auto bg-white min-h-screen shadow-md relative flex flex-col">
+  <div id="main-content" class="max-w-md mx-auto bg-white min-h-screen shadow-md relative flex flex-col no-select">
     <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
         <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white shadow-sm"><i class="fas fa-leaf text-xs"></i></div>
@@ -50,21 +43,19 @@
     </div>
 
     <div class="p-5 flex flex-col gap-4 flex-grow">
-        
         <div>
             <div class="text-center mt-2 mb-4">
                 <button onclick="loadFavoritesMode()" class="bg-red-50 text-red-600 border border-red-200 text-sm font-medium px-4 py-2 rounded-full shadow-sm hover:bg-red-100 transition-colors">
                     ❤️ ทบทวนรายการโปรดของฉัน
                 </button>
             </div>
-    
             <label class="block mb-2 text-sm font-medium text-gray-700">เลือกหมวดหมู่สินค้า:</label>
             <select id="categorySelect" onchange="changeCategory()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5 shadow-sm">
                 <option value="">กำลังโหลดข้อมูล...</option>
             </select>
         </div>
 
-        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center relative shadow-sm mt-2">
+        <div id="lessonCard" class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center relative shadow-sm mt-2">
             <span id="categoryBadge" class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-black text-white text-[10px] px-3 py-1 rounded-full tracking-widest">-</span>
             
             <button onclick="toggleFavorite()" class="absolute top-3 right-4 text-2xl outline-none focus:outline-none transition-transform active:scale-90 z-10 hover:scale-110">
@@ -88,8 +79,7 @@
 
             <div id="vocabBox" class="mt-4 bg-yellow-50 rounded-xl p-4 border border-yellow-100 hidden text-left shadow-sm">
                 <h3 class="font-bold text-yellow-800 text-sm mb-2"><i class="fas fa-book-open mr-1"></i> คำศัพท์น่ารู้</h3>
-                <ul id="vocabList" class="text-xs text-gray-700 space-y-1.5 leading-relaxed">
-                </ul>
+                <ul id="vocabList" class="text-xs text-gray-700 space-y-1.5 leading-relaxed"></ul>
             </div>
         </div>
 
@@ -105,17 +95,15 @@
             <button id="stopBtn" onclick="stopRecording()" class="w-12 h-12 rounded-full bg-red-50 text-red-400 flex items-center justify-center shadow-sm border border-red-100 hover:bg-red-100 transition opacity-50 cursor-not-allowed" disabled><i class="fas fa-paper-plane text-lg text-red-500"></i></button>
         </div>
 
-        <div id="statusMsg" class="text-center text-sm text-blue-600 h-6 font-medium animate-pulse">กำลังซิงค์ข้อมูล...</div>
+        <div id="statusMsg" class="text-center text-sm text-blue-600 h-6 font-medium">กำลังซิงค์ข้อมูล...</div>
 
-        <div id="resultBox" class="hidden bg-green-50 rounded-2xl p-5 border border-green-100 shadow-sm transition-all mb-4">
+        <div id="resultBox" class="hidden bg-green-50 rounded-2xl p-5 border border-green-100 shadow-sm mb-4">
             <div class="flex justify-between items-center border-b border-green-200 pb-2 mb-3">
                 <h3 class="font-bold text-green-800"><i class="fas fa-check-circle mr-2"></i>ผลการประเมิน</h3>
-                
-                <button id="toggleVoiceBtn" onclick="toggleAIVoice()" class="bg-white text-gray-600 border border-gray-200 text-xs font-medium px-3 py-1 rounded-full shadow-sm hover:bg-gray-50 transition-colors flex items-center">
+                <button id="toggleVoiceBtn" onclick="toggleAIVoice()" class="bg-white text-gray-600 border border-gray-200 text-xs font-medium px-3 py-1 rounded-full shadow-sm hover:bg-gray-50 flex items-center">
                     <i id="voiceIcon" class="fas fa-volume-up text-green-500 mr-1"></i> <span id="voiceText" class="ml-1">เสียง AI: เปิด</span>
                 </button>
             </div>
-            
             <div class="flex justify-between items-center mb-3">
                 <span class="text-gray-700 text-sm">คะแนน:</span>
                 <span class="text-3xl font-bold text-green-600"><span id="scoreText">0</span><span class="text-sm text-green-500">/100</span></span>
@@ -129,19 +117,22 @@
                 <p id="feedbackText" class="text-gray-800 text-sm bg-white p-3 rounded-lg border border-green-100 shadow-sm"></p>
             </div>
         </div>
-
     </div>
   </div>
+
   <script>
-    // 🛑 นำ URL จาก Apps Script (ที่เพิ่งก๊อปปี้มาใหม่จากสเตป 1) มาวางตรงนี้ครับ 🛑
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzj5szbg3M8CO7PGrCa2Zz8M5TlOfmELrOYZXtZOaTgMhLoVzGApNk1_afHYYk2hVDHag/exec"; 
 
     let allLessons = [];
     let currentCategoryLessons = [];
     let currentIndex = 0;
-    
     let mediaRecorder;
     let audioChunks = [];
+    let isAIVoiceEnabled = true;
+
+    // --- ส่วนของ Swipe & Audio Context ---
+    let touchstartX = 0;
+    let touchendX = 0;
 
     window.onload = () => {
         fetch(GAS_URL)
@@ -155,8 +146,60 @@
             .catch(err => {
                 document.getElementById('statusMsg').innerText = "❌ โหลดข้อมูลไม่สำเร็จ: " + err.message;
             });
+
+        // เปิดใช้งาน Swipe
+        const gestureZone = document.getElementById('main-content');
+        gestureZone.addEventListener('touchstart', e => {
+            touchstartX = e.changedTouches[0].screenX;
+        }, false);
+
+        gestureZone.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX;
+            handleGesture();
+        }, false);
     };
 
+    function playFlipSound() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.1);
+        } catch(e) { console.log("Audio play blocked"); }
+    }
+
+    function handleGesture() {
+        const threshold = 70;
+        const card = document.getElementById('lessonCard');
+        
+        if (touchendX < touchstartX - threshold) { // Swipe Left (Next)
+            if (currentIndex < currentCategoryLessons.length - 1) {
+                playFlipSound();
+                card.classList.remove('slide-next-enter', 'slide-prev-enter');
+                void card.offsetWidth; 
+                card.classList.add('slide-next-enter');
+                nextLesson();
+            }
+        } else if (touchendX > touchstartX + threshold) { // Swipe Right (Prev)
+            if (currentIndex > 0) {
+                playFlipSound();
+                card.classList.remove('slide-next-enter', 'slide-prev-enter');
+                void card.offsetWidth;
+                card.classList.add('slide-prev-enter');
+                prevLesson();
+            }
+        }
+    }
+
+    // --- ฟังก์ชันหลักของแอป ---
     function setupCategories() {
         const categories = [...new Set(allLessons.map(item => item.category))];
         const select = document.getElementById('categorySelect');
@@ -174,383 +217,149 @@
         updateUI();
     }
 
-    function prevLesson() {
-        if (currentIndex > 0) { currentIndex--; updateUI(); }
-    }
+    function prevLesson() { if (currentIndex > 0) { currentIndex--; updateUI(); } }
+    function nextLesson() { if (currentIndex < currentCategoryLessons.length - 1) { currentIndex++; updateUI(); } }
 
-    function nextLesson() {
-        if (currentIndex < currentCategoryLessons.length - 1) { currentIndex++; updateUI(); }
-    }
-
-function updateUI() {
+    function updateUI() {
         const lesson = currentCategoryLessons[currentIndex];
+        const card = document.getElementById('lessonCard');
+        
         document.getElementById('categoryBadge').innerText = lesson.category;
         
-        // จัดการชื่อกลิ่น Scent
         const scentEl = document.getElementById('scentText');
         if (lesson.scent && lesson.scent.trim() !== "") {
             scentEl.innerText = "Scent: " + lesson.scent;
             scentEl.classList.remove('hidden');
-        } else {
-            scentEl.classList.add('hidden');
-        }
+        } else { scentEl.classList.add('hidden'); }
 
-        // จัดการ KeyNote
-        const keyNoteBox = document.getElementById('keyNoteBox');
         const keyNoteText = document.getElementById('keyNoteText');
-        
         if (lesson.keyNote && lesson.keyNote.trim() !== "") {
-            const note = lesson.keyNote.trim();
-            
-            // ตรวจสอบว่าข้อความในช่อง KeyNote เป็นป้ายบอกประเภท หรือเป็นชื่อกลิ่น
-            if (note.includes('วิธีใช้')) {
-                keyNoteText.innerText = note; // ไม่ใส่คำว่า Key Note:
-                keyNoteText.className = "bg-emerald-50 text-emerald-600 border border-emerald-200 text-[11px] font-bold px-3 py-1 rounded-full tracking-wide shadow-sm";
-            } else if (note.includes('จุดเด่น')) {
-                keyNoteText.innerText = note; // ไม่ใส่คำว่า Key Note:
-                keyNoteText.className = "bg-sky-50 text-sky-600 border border-sky-200 text-[11px] font-bold px-3 py-1 rounded-full tracking-wide shadow-sm";
-            } else if (note.includes('แนะนำสินค้า')) {
-                keyNoteText.innerText = note; // ไม่ใส่คำว่า Key Note:
-                keyNoteText.className = "bg-purple-50 text-purple-600 border border-purple-200 text-[11px] font-bold px-3 py-1 rounded-full tracking-wide shadow-sm";
-            } else {
-                // ถ้าเป็นชื่อกลิ่น/ส่วนผสม (เช่น Thai Jasmine & Mint) ให้เติมคำว่า Key Note: 
-                keyNoteText.innerText = "Key Note: " + note;
-                keyNoteText.className = "bg-gray-100 text-gray-700 border border-gray-200 text-[11px] font-medium px-3 py-1 rounded-full shadow-sm";
-            }
-            
-            keyNoteBox.classList.remove('hidden'); 
-        } else {
-            keyNoteBox.classList.add('hidden'); 
-        }
+            keyNoteText.innerText = (lesson.keyNote.includes('วิธีใช้') || lesson.keyNote.includes('จุดเด่น')) ? lesson.keyNote : "Key Note: " + lesson.keyNote;
+            document.getElementById('keyNoteBox').classList.remove('hidden'); 
+        } else { document.getElementById('keyNoteBox').classList.add('hidden'); }
 
-        // 🔥 จัดการเช็คสถานะหัวใจ (สีแดง/สีเทา) 🔥
         const favs = JSON.parse(localStorage.getItem('panpuri_favs')) || [];
         const isFav = favs.some(f => f.chineseText === lesson.chineseText);
-        const favIcon = document.getElementById('favIcon');
-        if (favIcon) {
-            if (isFav) {
-                favIcon.className = "fas fa-heart text-red-500"; // แดง
-            } else {
-                favIcon.className = "far fa-heart text-gray-300"; // กลวงเทา
-            }
-        }
+        document.getElementById('favIcon').className = isFav ? "fas fa-heart text-red-500" : "far fa-heart text-gray-300";
 
         document.getElementById('chineseText').innerText = lesson.chineseText;
         document.getElementById('pinyinText').innerText = `(${lesson.pinyinText})`;
         
-        // จัดการคำแปลภาษาไทย 
-        const thaiTextBox = document.getElementById('thaiTextBox');
         const thaiTextEl = document.getElementById('thaiText');
-        if (lesson.thaiText && lesson.thaiText.trim() !== "" && lesson.thaiText.trim() !== "-") {
-            thaiTextEl.innerText = lesson.thaiText; 
-            thaiTextBox.classList.remove('hidden');
-        } else {
-            thaiTextBox.classList.add('hidden');
-        }
-        
-        // จัดการรูปภาพ
+        if (lesson.thaiText && lesson.thaiText !== "-") {
+            thaiTextEl.innerText = lesson.thaiText;
+            document.getElementById('thaiTextBox').classList.remove('hidden');
+        } else { document.getElementById('thaiTextBox').classList.add('hidden'); }
+
         const imgEl = document.getElementById('productImage');
-        if (lesson.imageUrl && lesson.imageUrl.trim() !== "") {
+        if (lesson.imageUrl) {
             imgEl.src = lesson.imageUrl;
             imgEl.classList.remove('hidden');
-        } else {
-            imgEl.classList.add('hidden');
-        }
-        
-        // จัดการคำศัพท์ (ให้กดฟังเสียงได้) 
-        const vocabBox = document.getElementById('vocabBox');
+        } else { imgEl.classList.add('hidden'); }
+
         const vocabList = document.getElementById('vocabList');
-        if (lesson.vocab && lesson.vocab.trim() !== "") {
+        if (lesson.vocab) {
             const words = lesson.vocab.split('|');
-            
             vocabList.innerHTML = words.map(w => {
-                const cleanWord = w.trim();
-                const chineseOnly = cleanWord.split('(')[0].trim();
-                
-                return `<li onclick="speakWord('${chineseOnly}')" class="border-b border-yellow-200/50 pb-2 pt-2 last:border-0 cursor-pointer hover:bg-yellow-100 transition-colors px-2 rounded-md flex items-center justify-between active:bg-yellow-200">
-                    <span><span class="text-yellow-600 mr-1">✨</span> ${cleanWord}</span>
-                    <i class="fas fa-volume-up text-yellow-500 text-xs opacity-70"></i>
+                const chineseOnly = w.split('(')[0].trim();
+                return `<li onclick="speakWord('${chineseOnly}')" class="border-b border-yellow-200/50 pb-2 pt-2 last:border-0 flex justify-between items-center active:bg-yellow-100 px-2 rounded">
+                    <span>${w}</span><i class="fas fa-volume-up text-yellow-500 text-xs"></i>
                 </li>`;
             }).join('');
-            
-            vocabBox.classList.remove('hidden');
-        } else {
-            vocabBox.classList.add('hidden');
-        }
-        
+            document.getElementById('vocabBox').classList.remove('hidden');
+        } else { document.getElementById('vocabBox').classList.add('hidden'); }
+
         document.getElementById('lessonCounter').innerText = `${currentIndex + 1} / ${currentCategoryLessons.length}`;
         document.getElementById('statusMsg').innerText = "";
         document.getElementById('resultBox').classList.add('hidden'); 
     }
-    function playExampleAudio() {
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(document.getElementById('chineseText').innerText);
-        utterance.lang = 'zh-CN'; utterance.rate = 0.8;
-        window.speechSynthesis.speak(utterance);
-      }
-    }
 
-    async function startRecording() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-        mediaRecorder.onstop = async () => {
-          sendToAI(new Blob(audioChunks, { type: 'audio/webm' }));
-          audioChunks = []; 
-        };
-        mediaRecorder.start();
-        
-        document.getElementById('recordBtn').disabled = true;
-        document.getElementById('recordBtn').classList.add('mic-recording');
-        document.getElementById('stopBtn').disabled = false;
-        document.getElementById('stopBtn').classList.remove('opacity-50', 'cursor-not-allowed');
-        document.getElementById('statusMsg').innerText = "🎙️ กำลังฟัง... พูดได้เลยครับ";
-        document.getElementById('resultBox').classList.add('hidden');
-      } catch (err) { alert("กรุณาอนุญาตการใช้ไมโครโฟนครับ"); }
-    }
-
-    function stopRecording() {
-      mediaRecorder.stop();
-      document.getElementById('recordBtn').disabled = false;
-      document.getElementById('recordBtn').classList.remove('mic-recording');
-      document.getElementById('stopBtn').disabled = true;
-      document.getElementById('stopBtn').classList.add('opacity-50', 'cursor-not-allowed');
-      document.getElementById('statusMsg').innerText = "⏳ กำลังวิเคราะห์น้ำเสียง... รอสักครู่";
-    }
-
-   function sendToAI(blob) {
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onloadend = function() {
-        const currentTargetText = document.getElementById('chineseText').innerText; 
-        
-        fetch(GAS_URL, {
-          method: 'POST',
-          body: JSON.stringify({ audioBase64: reader.result, targetSentence: currentTargetText }),
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-        })
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('statusMsg').innerText = "";
-            document.getElementById('resultBox').classList.remove('hidden');
-            document.getElementById('scoreText').innerText = data.score || 0;
-            document.getElementById('wrongWordsText').innerText = (data.wrong_words && data.wrong_words.length > 0) ? data.wrong_words.join(", ") : "ไม่มี (เป๊ะมาก!)";
-            
-            const aiMessage = data.feedback || "พยายามต่อไปครับ!";
-            document.getElementById('feedbackText').innerText = aiMessage;
-            
-            // 🔥 สั่งให้อ่านออกเสียงข้อความฟีดแบ็กทันทีที่แสดงผล 🔥
-            speakAIFeedback(aiMessage);
-        })
-        .catch(error => { document.getElementById('statusMsg').innerText = "❌ ขัดข้อง: " + error.message; });
-      };
-    }
-    // ฟังก์ชันสำหรับอ่านออกเสียงคำศัพท์ทีละคำ
-    function speakWord(word) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel(); // สั่งให้หยุดเสียงเก่าก่อน (ถ้ามี)
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = 'zh-CN'; 
-        utterance.rate = 0.75; // ปรับให้พูดช้าลงนิดนึงเพื่อให้ออกเสียงตามง่ายๆ
-        window.speechSynthesis.speak(utterance);
-      }
-    }
-    // 1. ฟังก์ชันดึงรายการโปรดจากความจำมือถือ
-    function getFavorites() {
-        return JSON.parse(localStorage.getItem('panpuri_favs')) || [];
-    }
-
-    // 2. ฟังก์ชันกดหัวใจ (เซฟ/ลบ ข้อมูล)
     function toggleFavorite() {
         const lesson = currentCategoryLessons[currentIndex];
-        let favs = getFavorites();
-        
-        // เช็คว่าเคยเซฟประโยคนี้ไว้หรือยัง
-        const existingIndex = favs.findIndex(f => f.chineseText === lesson.chineseText);
-        
-        if (existingIndex > -1) {
-            // ถ้ามีแล้ว = กดเพื่อเอาออก (Unlike)
-            favs.splice(existingIndex, 1); 
-            document.getElementById('favIcon').className = "far fa-heart text-gray-300"; // เปลี่ยนเป็นหัวใจกลวง
-        } else {
-            // ถ้ายังไม่มี = กดเพื่อบันทึก (Like)
-            favs.push(lesson); 
-            document.getElementById('favIcon').className = "fas fa-heart text-red-500"; // เปลี่ยนเป็นหัวใจสีแดง
-        }
-        localStorage.setItem('panpuri_favs', JSON.stringify(favs)); // สั่งเซฟลงเครื่อง
+        let favs = JSON.parse(localStorage.getItem('panpuri_favs')) || [];
+        const idx = favs.findIndex(f => f.chineseText === lesson.chineseText);
+        if (idx > -1) favs.splice(idx, 1); else favs.push(lesson);
+        localStorage.setItem('panpuri_favs', JSON.stringify(favs));
+        updateUI();
     }
 
-    // 3. ฟังก์ชันเปิดโหมดทบทวน
     function loadFavoritesMode() {
-        const favs = getFavorites();
-        if (favs.length === 0) {
-            alert("คุณยังไม่มีรายการโปรดเลยครับ ลองกดหัวใจที่มุมขวาบน 🤍 เพื่อเก็บประโยคไว้ท่องดูนะครับ!");
-            return;
-        }
-        // เอารายการโปรดในเครื่อง มาแทนที่เนื้อหาปัจจุบัน
+        const favs = JSON.parse(localStorage.getItem('panpuri_favs')) || [];
+        if (favs.length === 0) return alert("ยังไม่มีรายการโปรดครับ");
         currentCategoryLessons = favs;
         currentIndex = 0;
         updateUI();
-        document.getElementById('categoryBadge').innerText = "⭐ FAVORITES"; // เปลี่ยนป้ายชื่อ
+        document.getElementById('categoryBadge').innerText = "⭐ FAVORITES";
     }
-    // ตัวแปรความจำว่า ตอนนี้ผู้ใช้เปิดหรือปิดเสียง AI อยู่ (เริ่มต้นให้เปิดไว้)
-    let isAIVoiceEnabled = true;
 
-    // ฟังก์ชันสำหรับกดปุ่มสลับเปิด/ปิดเสียง
+    function playExampleAudio() {
+        const utterance = new SpeechSynthesisUtterance(document.getElementById('chineseText').innerText);
+        utterance.lang = 'zh-CN'; utterance.rate = 0.8;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function speakWord(word) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'zh-CN'; utterance.rate = 0.75;
+        window.speechSynthesis.speak(utterance);
+    }
+
     function toggleAIVoice() {
-        isAIVoiceEnabled = !isAIVoiceEnabled; // สลับค่าไปมา
-        const icon = document.getElementById('voiceIcon');
-        const text = document.getElementById('voiceText');
-        
-        if (isAIVoiceEnabled) {
-            // ถ้าเปิดเสียง: ไอคอนสีเขียว
-            icon.className = "fas fa-volume-up text-green-500 mr-1";
-            text.innerText = "เสียง AI: เปิด";
-        } else {
-            // ถ้าปิดเสียง: ไอคอนสีเทา และสั่งให้หยุดพูดทันที
-            icon.className = "fas fa-volume-mute text-gray-400 mr-1";
-            text.innerText = "เสียง AI: ปิด";
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); 
-            }
-        }
+        isAIVoiceEnabled = !isAIVoiceEnabled;
+        document.getElementById('voiceIcon').className = isAIVoiceEnabled ? "fas fa-volume-up text-green-500 mr-1" : "fas fa-volume-mute text-gray-400 mr-1";
+        document.getElementById('voiceText').innerText = isAIVoiceEnabled ? "เสียง AI: เปิด" : "เสียง AI: ปิด";
+        if (!isAIVoiceEnabled) window.speechSynthesis.cancel();
     }
 
-    // 4. ฟังก์ชันให้อ่านออกเสียงคำแนะนำจาก AI (อัปเดตใหม่)
-    function speakAIFeedback(feedbackText) {
-        // 🔥 เช็คก่อนว่าระบบเสียงเปิดอยู่ไหม ถ้าปิดอยู่ให้ข้ามไปเลย ไม่ต้องพูด 🔥
-        if (!isAIVoiceEnabled) return; 
-
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel(); // หยุดเสียงเก่าที่อาจจะค้างอยู่ก่อน
-            const utterance = new SpeechSynthesisUtterance(feedbackText);
-            utterance.lang = 'th-TH'; // บังคับให้อ่านเป็นเสียงภาษาไทย
-            utterance.rate = 1.0;     
-            utterance.pitch = 1.0;    
-            window.speechSynthesis.speak(utterance);
-        }
+    function speakAIFeedback(text) {
+        if (!isAIVoiceEnabled) return;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'th-TH'; window.speechSynthesis.speak(utterance);
     }
-    // --- ส่วนที่เพิ่มใหม่: ระบบสไลด์หน้าจอ (Swipe Gestures) ---
-    
-    let touchstartX = 0;
-    let touchendX = 0;
 
-    // เลือกพื้นที่ที่ต้องการให้สไลด์ได้ (ในที่นี้คือตัว body หรือจะเจาะจงเฉพาะส่วนเนื้อหาหลักก็ได้)
-    const gestureZone = document.body;
-
-    gestureZone.addEventListener('touchstart', e => {
-        touchstartX = e.changedTouches[0].screenX;
-    }, false);
-
-    gestureZone.addEventListener('touchend', e => {
-        touchendX = e.changedTouches[0].screenX;
-        handleGesture();
-    }, false);
-
-    function handleGesture() {
-        const swipeThreshold = 80; // ระยะขั้นต่ำที่ถือว่าเป็นการสไลด์ (พิกเซล)
-        
-        // ลากนิ้วจากขวาไปซ้าย (ไปหน้าถัดไป)
-        if (touchendX < touchstartX - swipeThreshold) {
-            if (currentIndex < currentCategoryLessons.length - 1) {
-                // เพิ่ม Effect เล็กน้อยก่อนเปลี่ยนหน้า (Optional)
-                document.querySelector('.max-w-md').style.opacity = "0.5";
-                setTimeout(() => {
-                    nextLesson();
-                    document.querySelector('.max-w-md').style.opacity = "1";
-                }, 100);
-            }
-        }
-        
-        // ลากนิ้วจากซ้ายไปขวา (ย้อนกลับ)
-        if (touchendX > touchstartX + swipeThreshold) {
-            if (currentIndex > 0) {
-                document.querySelector('.max-w-md').style.opacity = "0.5";
-                setTimeout(() => {
-                    prevLesson();
-                    document.querySelector('.max-w-md').style.opacity = "1";
-                }, 100);
-            }
-        }
+    // --- ระบบบันทึกเสียง ---
+    async function startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => sendToAI(new Blob(audioChunks, { type: 'audio/webm' }));
+            audioChunks = []; mediaRecorder.start();
+            document.getElementById('recordBtn').classList.add('mic-recording');
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('stopBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('statusMsg').innerText = "🎙️ กำลังฟัง...";
+        } catch (e) { alert("กรุณาอนุญาตไมโครโฟน"); }
     }
-    // --- จบส่วนระบบสไลด์ --
-    // --- ส่วนที่เพิ่มใหม่: ระบบสไลด์หน้าจอพร้อมเสียงและ Animation ---
 
-let touchstartX = 0;
-let touchendX = 0;
-
-// สร้างเสียง "ติ๊ง" หรือ "ฟึ่บ" สั้นๆ ด้วย Code (ไม่ต้องใช้ไฟล์เสียงภายนอก)
-function playFlipSound() {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // ความถี่เสียง
-    oscillator.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.1);
-
-    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.1);
-}
-
-const gestureZone = document.querySelector('.max-w-md'); // เจาะจงพื้นที่สไลด์
-
-gestureZone.addEventListener('touchstart', e => {
-    touchstartX = e.changedTouches[0].screenX;
-}, false);
-
-gestureZone.addEventListener('touchend', e => {
-    touchendX = e.changedTouches[0].screenX;
-    handleGesture();
-}, false);
-
-function handleGesture() {
-    const swipeThreshold = 80;
-    const content = document.querySelector('.max-w-md'); // ตัวแผ่นหน้าจอหลัก
-
-    // สไลด์ไปหน้าถัดไป (ขวาไปซ้าย)
-    if (touchendX < touchstartX - swipeThreshold) {
-        if (currentIndex < currentCategoryLessons.length - 1) {
-            playFlipSound();
-            content.classList.remove('slide-next-enter', 'slide-prev-enter');
-            void content.offsetWidth; // Force Reflow เพื่อให้เล่นซ้ำได้
-            content.classList.add('slide-next-enter');
-            nextLesson();
-        }
+    function stopRecording() {
+        mediaRecorder.stop();
+        document.getElementById('recordBtn').classList.remove('mic-recording');
+        document.getElementById('stopBtn').disabled = true;
+        document.getElementById('statusMsg').innerText = "⏳ วิเคราะห์เสียง...";
     }
-    
-    // สไลด์ย้อนกลับ (ซ้ายไปขวา)
-    if (touchendX > touchstartX + swipeThreshold) {
-        if (currentIndex > 0) {
-            playFlipSound();
-            content.classList.remove('slide-next-enter', 'slide-prev-enter');
-            void content.offsetWidth; 
-            content.classList.add('slide-prev-enter');
-            prevLesson();
-        }
+
+    function sendToAI(blob) {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+            fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ audioBase64: reader.result, targetSentence: document.getElementById('chineseText').innerText }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('statusMsg').innerText = "";
+                document.getElementById('resultBox').classList.remove('hidden');
+                document.getElementById('scoreText').innerText = data.score || 0;
+                document.getElementById('wrongWordsText').innerText = data.wrong_words?.join(", ") || "ไม่มี";
+                document.getElementById('feedbackText').innerText = data.feedback;
+                speakAIFeedback(data.feedback);
+            });
+        };
     }
-}
-// --- จบส่วนระบบสไลด์พร้อมลูกเล่น ---
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
