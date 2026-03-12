@@ -11,6 +11,30 @@
     body { font-family: 'Prompt', 'Noto Sans SC', sans-serif; background-color: #f8fafc; }
     .mic-recording { animation: pulse 1.5s infinite; background-color: #ef4444 !important; color: white !important; border-color: #ef4444 !important; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+    /* Animation สำหรับสไลด์ไปหน้าถัดไป */
+.slide-next-enter {
+  animation: slideNext 0.4s ease-out;
+}
+
+/* Animation สำหรับสไลด์ย้อนกลับ */
+.slide-prev-enter {
+  animation: slidePrev 0.4s ease-out;
+}
+
+@keyframes slideNext {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slidePrev {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ทำให้ Container หลักมีการเปลี่ยนที่นุ่มนวล */
+#app-container {
+  transition: transform 0.3s ease;
+}
   </style>
 </head>
 <body>
@@ -450,34 +474,74 @@ function updateUI() {
             }
         }
     }
-    // --- จบส่วนระบบสไลด์ ---
-    /* Animation สำหรับสไลด์ไปหน้าถัดไป */
-.slide-next-enter {
-  animation: slideNext 0.4s ease-out;
+    // --- จบส่วนระบบสไลด์ --
+    // --- ส่วนที่เพิ่มใหม่: ระบบสไลด์หน้าจอพร้อมเสียงและ Animation ---
+
+let touchstartX = 0;
+let touchendX = 0;
+
+// สร้างเสียง "ติ๊ง" หรือ "ฟึ่บ" สั้นๆ ด้วย Code (ไม่ต้องใช้ไฟล์เสียงภายนอก)
+function playFlipSound() {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // ความถี่เสียง
+    oscillator.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.1);
+
+    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.1);
 }
 
-/* Animation สำหรับสไลด์ย้อนกลับ */
-.slide-prev-enter {
-  animation: slidePrev 0.4s ease-out;
-}
+const gestureZone = document.querySelector('.max-w-md'); // เจาะจงพื้นที่สไลด์
 
-@keyframes slideNext {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
+gestureZone.addEventListener('touchstart', e => {
+    touchstartX = e.changedTouches[0].screenX;
+}, false);
 
-@keyframes slidePrev {
-  from { transform: translateX(-100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
+gestureZone.addEventListener('touchend', e => {
+    touchendX = e.changedTouches[0].screenX;
+    handleGesture();
+}, false);
 
-/* ทำให้ Container หลักมีการเปลี่ยนที่นุ่มนวล */
-#app-container {
-  transition: transform 0.3s ease;
+function handleGesture() {
+    const swipeThreshold = 80;
+    const content = document.querySelector('.max-w-md'); // ตัวแผ่นหน้าจอหลัก
+
+    // สไลด์ไปหน้าถัดไป (ขวาไปซ้าย)
+    if (touchendX < touchstartX - swipeThreshold) {
+        if (currentIndex < currentCategoryLessons.length - 1) {
+            playFlipSound();
+            content.classList.remove('slide-next-enter', 'slide-prev-enter');
+            void content.offsetWidth; // Force Reflow เพื่อให้เล่นซ้ำได้
+            content.classList.add('slide-next-enter');
+            nextLesson();
+        }
+    }
+    
+    // สไลด์ย้อนกลับ (ซ้ายไปขวา)
+    if (touchendX > touchstartX + swipeThreshold) {
+        if (currentIndex > 0) {
+            playFlipSound();
+            content.classList.remove('slide-next-enter', 'slide-prev-enter');
+            void content.offsetWidth; 
+            content.classList.add('slide-prev-enter');
+            prevLesson();
+        }
+    }
 }
+// --- จบส่วนระบบสไลด์พร้อมลูกเล่น ---
   </script>
 </body>
 </html>
+
 
 
 
