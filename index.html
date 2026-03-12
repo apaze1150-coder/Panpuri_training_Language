@@ -407,9 +407,54 @@ function updateUI() {
             window.speechSynthesis.speak(utterance);
         }
     }
+    // --- ส่วนที่เพิ่มใหม่: ระบบสไลด์หน้าจอ (Swipe Gestures) ---
+    
+    let touchstartX = 0;
+    let touchendX = 0;
+
+    // เลือกพื้นที่ที่ต้องการให้สไลด์ได้ (ในที่นี้คือตัว body หรือจะเจาะจงเฉพาะส่วนเนื้อหาหลักก็ได้)
+    const gestureZone = document.body;
+
+    gestureZone.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX;
+    }, false);
+
+    gestureZone.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        handleGesture();
+    }, false);
+
+    function handleGesture() {
+        const swipeThreshold = 80; // ระยะขั้นต่ำที่ถือว่าเป็นการสไลด์ (พิกเซล)
+        
+        // ลากนิ้วจากขวาไปซ้าย (ไปหน้าถัดไป)
+        if (touchendX < touchstartX - swipeThreshold) {
+            if (currentIndex < currentCategoryLessons.length - 1) {
+                // เพิ่ม Effect เล็กน้อยก่อนเปลี่ยนหน้า (Optional)
+                document.querySelector('.max-w-md').style.opacity = "0.5";
+                setTimeout(() => {
+                    nextLesson();
+                    document.querySelector('.max-w-md').style.opacity = "1";
+                }, 100);
+            }
+        }
+        
+        // ลากนิ้วจากซ้ายไปขวา (ย้อนกลับ)
+        if (touchendX > touchstartX + swipeThreshold) {
+            if (currentIndex > 0) {
+                document.querySelector('.max-w-md').style.opacity = "0.5";
+                setTimeout(() => {
+                    prevLesson();
+                    document.querySelector('.max-w-md').style.opacity = "1";
+                }, 100);
+            }
+        }
+    }
+    // --- จบส่วนระบบสไลด์ ---
   </script>
 </body>
 </html>
+
 
 
 
