@@ -19,6 +19,30 @@
         @keyframes slidePrev { from { transform: translateX(-30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
         .no-select { -webkit-user-select: none; user-select: none; }
+        /* สไตล์พิเศษสำหรับแถวที่เป็นชื่อเรียกสินค้า */
+.keynote-product-name {
+    background-color: #f9fbf9; /* สีพื้นหลังอ่อนๆ ให้ดูสะอาด */
+    border-left: 5px solid #00472F; /* เส้นขอบหนาสีเขียวเข้มด้านซ้าย */
+}
+
+/* ปรับแต่งส่วนภาษาจีนในช่องชื่อเรียกสินค้า */
+.chinese-title {
+    font-size: 1.5rem; /* ขนาดใหญ่กว่าปกติ */
+    font-weight: bold;
+    color: #00472F;
+    background: #e6eee6; /* ใส่พื้นหลังอ่อนๆ ให้ตัวหนังสือ */
+    padding: 5px 15px;
+    border-radius: 20px; /* ทำเป็นทรงมนแบบ Badge */
+    display: inline-block;
+}
+
+/* ปรับแต่งส่วน Pinyin ให้ดูง่าย */
+.pinyin-title {
+    color: #666;
+    font-style: italic;
+    display: block;
+    margin-top: 5px;
+}
     </style>
 </head>
 <body>
@@ -312,3 +336,4 @@
     </script>
 </body>
 </html>
+
