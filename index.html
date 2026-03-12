@@ -1,365 +1,314 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PANPURI Chinese Teacher</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <style>
-    body { font-family: 'Prompt', 'Noto Sans SC', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
-    .mic-recording { animation: pulse 1.5s infinite; background-color: #ef4444 !important; color: white !important; border-color: #ef4444 !important; }
-    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-    
-    /* Animation สำหรับสไลด์ */
-    .slide-next-enter { animation: slideNext 0.4s ease-out; }
-    .slide-prev-enter { animation: slidePrev 0.4s ease-out; }
-
-    @keyframes slideNext {
-      from { transform: translateX(50px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    @keyframes slidePrev {
-      from { transform: translateX(-50px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    /* ป้องกันการเลือกข้อความขณะสไลด์บนมือถือ */
-    .no-select { -webkit-user-select: none; user-select: none; }
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>PAÑPURI Chinese Teacher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Prompt', 'Noto Sans SC', sans-serif; background-color: #f8fafc; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        .mic-recording { animation: pulse 1.5s infinite; background-color: #ef4444 !important; color: white !important; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        
+        /* สไลด์ Animation */
+        .slide-next { animation: slideNext 0.35s ease-out; }
+        .slide-prev { animation: slidePrev 0.35s ease-out; }
+        @keyframes slideNext { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slidePrev { from { transform: translateX(-30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        .no-select { -webkit-user-select: none; user-select: none; }
+    </style>
 </head>
 <body>
-  <div id="main-content" class="max-w-md mx-auto bg-white min-h-screen shadow-md relative flex flex-col no-select">
-    <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white shadow-sm"><i class="fas fa-leaf text-xs"></i></div>
-            <div>
-                <h1 class="font-bold text-gray-900 leading-none">PAÑPURI</h1>
-                <span class="text-[10px] text-gray-500 tracking-wider">CHINESE TEACHER</span>
+    <div id="main-app" class="max-w-md mx-auto bg-white min-h-screen shadow-md relative flex flex-col no-select">
+        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-20">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white"><i class="fas fa-leaf text-xs"></i></div>
+                <div>
+                    <h1 class="font-bold text-gray-900 leading-none">PAÑPURI</h1>
+                    <span class="text-[10px] text-gray-500 tracking-wider">CHINESE TEACHER</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="p-5 flex flex-col gap-4 flex-grow">
-        <div>
-            <div class="text-center mt-2 mb-4">
-                <button onclick="loadFavoritesMode()" class="bg-red-50 text-red-600 border border-red-200 text-sm font-medium px-4 py-2 rounded-full shadow-sm hover:bg-red-100 transition-colors">
+        <div class="p-5 flex flex-col gap-4 flex-grow">
+            <div class="flex flex-col gap-3">
+                <button onclick="loadFavoritesMode()" class="bg-red-50 text-red-600 border border-red-100 text-xs font-semibold py-2.5 rounded-xl shadow-sm active:scale-95 transition-transform">
                     ❤️ ทบทวนรายการโปรดของฉัน
                 </button>
-            </div>
-            <label class="block mb-2 text-sm font-medium text-gray-700">เลือกหมวดหมู่สินค้า:</label>
-            <select id="categorySelect" onchange="changeCategory()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5 shadow-sm">
-                <option value="">กำลังโหลดข้อมูล...</option>
-            </select>
-        </div>
-
-        <div id="lessonCard" class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center relative shadow-sm mt-2">
-            <span id="categoryBadge" class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-black text-white text-[10px] px-3 py-1 rounded-full tracking-widest">-</span>
-            
-            <button onclick="toggleFavorite()" class="absolute top-3 right-4 text-2xl outline-none focus:outline-none transition-transform active:scale-90 z-10 hover:scale-110">
-                <i id="favIcon" class="far fa-heart text-gray-300"></i>
-            </button>
-
-            <p id="scentText" class="text-sm font-semibold text-gray-500 tracking-wide mt-3 mb-1 hidden"></p>
-            <div id="keyNoteBox" class="mt-1 mb-2 hidden">
-                <span id="keyNoteText" class="bg-gray-200 text-gray-600 text-[11px] font-medium px-2.5 py-1 rounded-full"></span>
-            </div>
-            
-            <img id="productImage" src="" alt="Product Image" class="w-48 h-48 object-contain mx-auto rounded-lg mt-3 mb-3 hidden shadow-sm border border-gray-200 p-1 bg-white">            
-            
-            <p class="text-gray-400 text-xs mt-2">ประโยคเป้าหมาย:</p>
-            <h2 id="chineseText" class="text-2xl font-bold text-gray-900 mt-2 mb-1">กำลังโหลด...</h2>
-            <p id="pinyinText" class="text-gray-500 italic text-sm">-</p>
-            
-            <div id="thaiTextBox" class="mt-4 pt-4 border-t border-gray-200 hidden">
-                <p id="thaiText" class="text-sm text-gray-700 font-medium"></p>
+                <select id="categorySelect" onchange="changeCategory()" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl block w-full p-3 outline-none focus:ring-1 focus:ring-black">
+                    <option value="">กำลังโหลดบทเรียน...</option>
+                </select>
             </div>
 
-            <div id="vocabBox" class="mt-4 bg-yellow-50 rounded-xl p-4 border border-yellow-100 hidden text-left shadow-sm">
-                <h3 class="font-bold text-yellow-800 text-sm mb-2"><i class="fas fa-book-open mr-1"></i> คำศัพท์น่ารู้</h3>
-                <ul id="vocabList" class="text-xs text-gray-700 space-y-1.5 leading-relaxed"></ul>
-            </div>
-        </div>
-
-        <div class="flex justify-between items-center px-2">
-            <button onclick="prevLesson()" class="text-gray-600 bg-gray-100 hover:bg-gray-200 px-4 py-1.5 rounded-full text-xs font-bold transition"><i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า</button>
-            <span id="lessonCounter" class="text-xs text-gray-500 font-medium">0 / 0</span>
-            <button onclick="nextLesson()" class="text-gray-600 bg-gray-100 hover:bg-gray-200 px-4 py-1.5 rounded-full text-xs font-bold transition">ถัดไป <i class="fas fa-chevron-right ml-1"></i></button>
-        </div>
-
-        <div class="flex justify-center items-center gap-6 my-4">
-            <button onclick="playExampleAudio()" class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shadow-sm border border-blue-100 hover:bg-blue-100 transition"><i class="fas fa-volume-up text-lg"></i></button>
-            <button id="recordBtn" onclick="startRecording()" class="w-16 h-16 rounded-full bg-gray-50 text-gray-700 flex items-center justify-center shadow-md border border-gray-200 hover:bg-gray-100 transition relative disabled:opacity-50" disabled><i class="fas fa-microphone text-2xl"></i></button>
-            <button id="stopBtn" onclick="stopRecording()" class="w-12 h-12 rounded-full bg-red-50 text-red-400 flex items-center justify-center shadow-sm border border-red-100 hover:bg-red-100 transition opacity-50 cursor-not-allowed" disabled><i class="fas fa-paper-plane text-lg text-red-500"></i></button>
-        </div>
-
-        <div id="statusMsg" class="text-center text-sm text-blue-600 h-6 font-medium">กำลังซิงค์ข้อมูล...</div>
-
-        <div id="resultBox" class="hidden bg-green-50 rounded-2xl p-5 border border-green-100 shadow-sm mb-4">
-            <div class="flex justify-between items-center border-b border-green-200 pb-2 mb-3">
-                <h3 class="font-bold text-green-800"><i class="fas fa-check-circle mr-2"></i>ผลการประเมิน</h3>
-                <button id="toggleVoiceBtn" onclick="toggleAIVoice()" class="bg-white text-gray-600 border border-gray-200 text-xs font-medium px-3 py-1 rounded-full shadow-sm hover:bg-gray-50 flex items-center">
-                    <i id="voiceIcon" class="fas fa-volume-up text-green-500 mr-1"></i> <span id="voiceText" class="ml-1">เสียง AI: เปิด</span>
+            <div id="lessonCard" class="bg-gray-50 rounded-3xl p-6 border border-gray-100 text-center relative shadow-sm mt-2 min-h-[400px] flex flex-col justify-center">
+                <span id="categoryBadge" class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-black text-white text-[10px] px-4 py-1 rounded-full tracking-widest shadow-md">-</span>
+                
+                <button onclick="toggleFavorite()" class="absolute top-4 right-4 text-2xl outline-none active:scale-125 transition-transform z-10">
+                    <i id="favIcon" class="far fa-heart text-gray-300"></i>
                 </button>
+
+                <div id="cardContent">
+                    <p id="scentText" class="text-sm font-bold text-gray-400 tracking-wide mb-1 hidden"></p>
+                    <div id="keyNoteBox" class="mb-4 hidden">
+                        <span id="keyNoteText" class="text-[11px] font-bold px-3 py-1 rounded-full shadow-sm"></span>
+                    </div>
+                    
+                    <img id="productImage" src="" class="w-40 h-40 object-contain mx-auto rounded-2xl mb-4 hidden bg-white p-2 border border-gray-100 shadow-sm">
+                    
+                    <p class="text-gray-400 text-[10px] uppercase tracking-tighter mb-1">Chinese Phrase</p>
+                    <h2 id="chineseText" class="text-3xl font-bold text-gray-900 mb-1 leading-tight">...</h2>
+                    <p id="pinyinText" class="text-gray-400 italic text-sm mb-4">...</p>
+                    
+                    <div id="thaiTextBox" class="pt-4 border-t border-gray-200 hidden">
+                        <p id="thaiText" class="text-sm text-gray-600 font-medium"></p>
+                    </div>
+
+                    <div id="vocabBox" class="mt-4 bg-yellow-50 rounded-2xl p-4 border border-yellow-100 hidden text-left shadow-sm">
+                        <h3 class="font-bold text-yellow-800 text-xs mb-2 uppercase tracking-wider">Vocabulary</h3>
+                        <ul id="vocabList" class="text-xs text-gray-700 space-y-2"></ul>
+                    </div>
+                </div>
             </div>
-            <div class="flex justify-between items-center mb-3">
-                <span class="text-gray-700 text-sm">คะแนน:</span>
-                <span class="text-3xl font-bold text-green-600"><span id="scoreText">0</span><span class="text-sm text-green-500">/100</span></span>
+
+            <div class="flex justify-between items-center px-2 mt-2">
+                <button onclick="prevLesson()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200"><i class="fas fa-chevron-left text-gray-500"></i></button>
+                <span id="lessonCounter" class="text-xs font-bold text-gray-400 bg-gray-100 px-4 py-1 rounded-full">0 / 0</span>
+                <button onclick="nextLesson()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200"><i class="fas fa-chevron-right text-gray-500"></i></button>
             </div>
-            <div class="mb-3">
-                <span class="text-gray-700 block text-xs mb-1">คำที่ควรปรับปรุง:</span>
-                <span id="wrongWordsText" class="text-red-500 font-medium bg-red-50 border border-red-100 px-2 py-1 rounded text-sm inline-block"></span>
+
+            <div class="flex justify-center items-center gap-8 my-4">
+                <button onclick="playExampleAudio()" class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100 active:scale-90 transition-transform"><i class="fas fa-volume-up text-lg"></i></button>
+                <button id="recordBtn" onclick="startRecording()" class="w-20 h-20 rounded-full bg-black text-white flex items-center justify-center shadow-xl active:scale-95 transition-transform disabled:opacity-20" disabled><i class="fas fa-microphone text-3xl"></i></button>
+                <button id="stopBtn" onclick="stopRecording()" class="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center border border-red-100 opacity-20 cursor-not-allowed" disabled><i class="fas fa-paper-plane"></i></button>
             </div>
-            <div>
-                <span class="text-gray-700 block text-xs mb-1">คำแนะนำ:</span>
-                <p id="feedbackText" class="text-gray-800 text-sm bg-white p-3 rounded-lg border border-green-100 shadow-sm"></p>
+
+            <div id="statusMsg" class="text-center text-[11px] font-bold text-blue-500 h-4 uppercase tracking-widest">Loading...</div>
+
+            <div id="resultBox" class="hidden bg-emerald-50 rounded-3xl p-6 border border-emerald-100 shadow-sm mb-6 transition-all">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-emerald-800 text-sm">RESULT</h3>
+                    <button onclick="toggleAIVoice()" class="bg-white px-3 py-1 rounded-full text-[10px] font-bold border border-emerald-200 text-emerald-700 shadow-sm">
+                        <i id="voiceIcon" class="fas fa-volume-up mr-1"></i> AI VOICE: <span id="voiceText">ON</span>
+                    </button>
+                </div>
+                <div class="text-center mb-4">
+                    <span class="text-5xl font-black text-emerald-600" id="scoreText">0</span><span class="text-emerald-400 text-sm">/100</span>
+                </div>
+                <div class="space-y-3">
+                    <div>
+                        <span class="text-[10px] font-bold text-emerald-400 uppercase">Improvement</span>
+                        <p id="wrongWordsText" class="text-red-500 font-bold text-sm"></p>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold text-emerald-400 uppercase">Advice</span>
+                        <p id="feedbackText" class="text-gray-700 text-sm leading-relaxed"></p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-  </div>
 
-  <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzj5szbg3M8CO7PGrCa2Zz8M5TlOfmELrOYZXtZOaTgMhLoVzGApNk1_afHYYk2hVDHag/exec"; 
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzj5szbg3M8CO7PGrCa2Zz8M5TlOfmELrOYZXtZOaTgMhLoVzGApNk1_afHYYk2hVDHag/exec"; 
+        let allLessons = [], currentCategoryLessons = [], currentIndex = 0;
+        let mediaRecorder, audioChunks = [], isAIVoiceEnabled = true;
+        let startX = 0;
 
-    let allLessons = [];
-    let currentCategoryLessons = [];
-    let currentIndex = 0;
-    let mediaRecorder;
-    let audioChunks = [];
-    let isAIVoiceEnabled = true;
-
-    // --- ส่วนของ Swipe & Audio Context ---
-    let touchstartX = 0;
-    let touchendX = 0;
-
-    window.onload = () => {
-        fetch(GAS_URL)
-            .then(res => res.json())
-            .then(data => {
-                if(data.error) throw new Error(data.error);
+        window.onload = () => {
+            fetch(GAS_URL).then(res => res.json()).then(data => {
                 allLessons = data;
                 setupCategories();
                 document.getElementById('recordBtn').disabled = false;
-            })
-            .catch(err => {
-                document.getElementById('statusMsg').innerText = "❌ โหลดข้อมูลไม่สำเร็จ: " + err.message;
+                document.getElementById('statusMsg').innerText = "Ready to Study";
+            }).catch(err => document.getElementById('statusMsg').innerText = "Error Loading Data");
+
+            // Swipe System
+            const card = document.getElementById('lessonCard');
+            card.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+            card.addEventListener('touchend', e => {
+                const diff = startX - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 70) diff > 0 ? nextLesson() : prevLesson();
             });
+        };
 
-        // เปิดใช้งาน Swipe
-        const gestureZone = document.getElementById('main-content');
-        gestureZone.addEventListener('touchstart', e => {
-            touchstartX = e.changedTouches[0].screenX;
-        }, false);
-
-        gestureZone.addEventListener('touchend', e => {
-            touchendX = e.changedTouches[0].screenX;
-            handleGesture();
-        }, false);
-    };
-
-    function playFlipSound() {
-        try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
-            oscillator.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.1);
-        } catch(e) { console.log("Audio play blocked"); }
-    }
-
-    function handleGesture() {
-        const threshold = 70;
-        const card = document.getElementById('lessonCard');
-        
-        if (touchendX < touchstartX - threshold) { // Swipe Left (Next)
-            if (currentIndex < currentCategoryLessons.length - 1) {
-                playFlipSound();
-                card.classList.remove('slide-next-enter', 'slide-prev-enter');
-                void card.offsetWidth; 
-                card.classList.add('slide-next-enter');
-                nextLesson();
-            }
-        } else if (touchendX > touchstartX + threshold) { // Swipe Right (Prev)
-            if (currentIndex > 0) {
-                playFlipSound();
-                card.classList.remove('slide-next-enter', 'slide-prev-enter');
-                void card.offsetWidth;
-                card.classList.add('slide-prev-enter');
-                prevLesson();
-            }
+        function playSwipeSound() {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.frequency.setValueAtTime(800, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 0.1);
         }
-    }
 
-    // --- ฟังก์ชันหลักของแอป ---
-    function setupCategories() {
-        const categories = [...new Set(allLessons.map(item => item.category))];
-        const select = document.getElementById('categorySelect');
-        select.innerHTML = '';
-        categories.forEach(cat => {
-            select.innerHTML += `<option value="${cat}">${cat}</option>`;
-        });
-        changeCategory(); 
-    }
+        function setupCategories() {
+            const cats = [...new Set(allLessons.map(i => i.category))];
+            const sel = document.getElementById('categorySelect');
+            sel.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+            changeCategory();
+        }
 
-    function changeCategory() {
-        const selectedCat = document.getElementById('categorySelect').value;
-        currentCategoryLessons = allLessons.filter(item => item.category === selectedCat);
-        currentIndex = 0;
-        updateUI();
-    }
+        function changeCategory() {
+            currentCategoryLessons = allLessons.filter(i => i.category === document.getElementById('categorySelect').value);
+            currentIndex = 0;
+            updateUI();
+        }
 
-    function prevLesson() { if (currentIndex > 0) { currentIndex--; updateUI(); } }
-    function nextLesson() { if (currentIndex < currentCategoryLessons.length - 1) { currentIndex++; updateUI(); } }
+        function nextLesson() { 
+            if (currentIndex < currentCategoryLessons.length - 1) { 
+                currentIndex++; 
+                animateCard('slide-next'); 
+                updateUI(); 
+            } 
+        }
 
-    function updateUI() {
-        const lesson = currentCategoryLessons[currentIndex];
-        const card = document.getElementById('lessonCard');
-        
-        document.getElementById('categoryBadge').innerText = lesson.category;
-        
-        const scentEl = document.getElementById('scentText');
-        if (lesson.scent && lesson.scent.trim() !== "") {
-            scentEl.innerText = "Scent: " + lesson.scent;
-            scentEl.classList.remove('hidden');
-        } else { scentEl.classList.add('hidden'); }
+        function prevLesson() { 
+            if (currentIndex > 0) { 
+                currentIndex--; 
+                animateCard('slide-prev'); 
+                updateUI(); 
+            } 
+        }
 
-        const keyNoteText = document.getElementById('keyNoteText');
-        if (lesson.keyNote && lesson.keyNote.trim() !== "") {
-            keyNoteText.innerText = (lesson.keyNote.includes('วิธีใช้') || lesson.keyNote.includes('จุดเด่น')) ? lesson.keyNote : "Key Note: " + lesson.keyNote;
-            document.getElementById('keyNoteBox').classList.remove('hidden'); 
-        } else { document.getElementById('keyNoteBox').classList.add('hidden'); }
+        function animateCard(cls) {
+            playSwipeSound();
+            const card = document.getElementById('lessonCard');
+            card.classList.remove('slide-next', 'slide-prev');
+            void card.offsetWidth; 
+            card.classList.add(cls);
+        }
 
-        const favs = JSON.parse(localStorage.getItem('panpuri_favs')) || [];
-        const isFav = favs.some(f => f.chineseText === lesson.chineseText);
-        document.getElementById('favIcon').className = isFav ? "fas fa-heart text-red-500" : "far fa-heart text-gray-300";
+        function updateUI() {
+            const lesson = currentCategoryLessons[currentIndex];
+            document.getElementById('categoryBadge').innerText = lesson.category;
+            document.getElementById('chineseText').innerText = lesson.chineseText;
+            document.getElementById('pinyinText').innerText = `(${lesson.pinyinText})`;
+            
+            // Scent & KeyNote Style
+            const scentEl = document.getElementById('scentText');
+            if(lesson.scent && lesson.scent !== "-") {
+                scentEl.innerText = `SCENT: ${lesson.scent}`;
+                scentEl.classList.remove('hidden');
+            } else scentEl.classList.add('hidden');
 
-        document.getElementById('chineseText').innerText = lesson.chineseText;
-        document.getElementById('pinyinText').innerText = `(${lesson.pinyinText})`;
-        
-        const thaiTextEl = document.getElementById('thaiText');
-        if (lesson.thaiText && lesson.thaiText !== "-") {
-            thaiTextEl.innerText = lesson.thaiText;
-            document.getElementById('thaiTextBox').classList.remove('hidden');
-        } else { document.getElementById('thaiTextBox').classList.add('hidden'); }
+            const knBox = document.getElementById('keyNoteBox');
+            const knText = document.getElementById('keyNoteText');
+            if(lesson.keyNote && lesson.keyNote !== "-") {
+                knText.innerText = lesson.keyNote;
+                knText.className = lesson.keyNote.includes('วิธีใช้') ? "bg-emerald-100 text-emerald-700" : "bg-gray-200 text-gray-600";
+                knBox.classList.remove('hidden');
+            } else knBox.classList.add('hidden');
 
-        const imgEl = document.getElementById('productImage');
-        if (lesson.imageUrl) {
-            imgEl.src = lesson.imageUrl;
-            imgEl.classList.remove('hidden');
-        } else { imgEl.classList.add('hidden'); }
+            // Image
+            const img = document.getElementById('productImage');
+            if(lesson.imageUrl) { img.src = lesson.imageUrl; img.classList.remove('hidden'); }
+            else img.classList.add('hidden');
 
-        const vocabList = document.getElementById('vocabList');
-        if (lesson.vocab) {
-            const words = lesson.vocab.split('|');
-            vocabList.innerHTML = words.map(w => {
-                const chineseOnly = w.split('(')[0].trim();
-                return `<li onclick="speakWord('${chineseOnly}')" class="border-b border-yellow-200/50 pb-2 pt-2 last:border-0 flex justify-between items-center active:bg-yellow-100 px-2 rounded">
-                    <span>${w}</span><i class="fas fa-volume-up text-yellow-500 text-xs"></i>
-                </li>`;
-            }).join('');
-            document.getElementById('vocabBox').classList.remove('hidden');
-        } else { document.getElementById('vocabBox').classList.add('hidden'); }
+            // Thai Text
+            const thBox = document.getElementById('thaiTextBox');
+            if(lesson.thaiText && lesson.thaiText !== "-") {
+                document.getElementById('thaiText').innerText = lesson.thaiText;
+                thBox.classList.remove('hidden');
+            } else thBox.classList.add('hidden');
 
-        document.getElementById('lessonCounter').innerText = `${currentIndex + 1} / ${currentCategoryLessons.length}`;
-        document.getElementById('statusMsg').innerText = "";
-        document.getElementById('resultBox').classList.add('hidden'); 
-    }
+            // Vocab
+            const vBox = document.getElementById('vocabBox');
+            if(lesson.vocab) {
+                const words = lesson.vocab.split('|');
+                document.getElementById('vocabList').innerHTML = words.map(w => {
+                    const clean = w.split('(')[0].trim();
+                    return `<li onclick="speakWord('${clean}')" class="flex justify-between items-center py-1 border-b border-yellow-100 last:border-0"><span>${w}</span><i class="fas fa-volume-up text-yellow-400"></i></li>`;
+                }).join('');
+                vBox.classList.remove('hidden');
+            } else vBox.classList.add('hidden');
 
-    function toggleFavorite() {
-        const lesson = currentCategoryLessons[currentIndex];
-        let favs = JSON.parse(localStorage.getItem('panpuri_favs')) || [];
-        const idx = favs.findIndex(f => f.chineseText === lesson.chineseText);
-        if (idx > -1) favs.splice(idx, 1); else favs.push(lesson);
-        localStorage.setItem('panpuri_favs', JSON.stringify(favs));
-        updateUI();
-    }
+            // Favorite Icon
+            const favs = JSON.parse(localStorage.getItem('panpuri_favs') || "[]");
+            const isFav = favs.some(f => f.chineseText === lesson.chineseText);
+            document.getElementById('favIcon').className = isFav ? "fas fa-heart text-red-500" : "far fa-heart text-gray-300";
 
-    function loadFavoritesMode() {
-        const favs = JSON.parse(localStorage.getItem('panpuri_favs')) || [];
-        if (favs.length === 0) return alert("ยังไม่มีรายการโปรดครับ");
-        currentCategoryLessons = favs;
-        currentIndex = 0;
-        updateUI();
-        document.getElementById('categoryBadge').innerText = "⭐ FAVORITES";
-    }
+            document.getElementById('lessonCounter').innerText = `${currentIndex + 1} / ${currentCategoryLessons.length}`;
+            document.getElementById('resultBox').classList.add('hidden');
+        }
 
-    function playExampleAudio() {
-        const utterance = new SpeechSynthesisUtterance(document.getElementById('chineseText').innerText);
-        utterance.lang = 'zh-CN'; utterance.rate = 0.8;
-        window.speechSynthesis.speak(utterance);
-    }
+        function toggleFavorite() {
+            let favs = JSON.parse(localStorage.getItem('panpuri_favs') || "[]");
+            const lesson = currentCategoryLessons[currentIndex];
+            const idx = favs.findIndex(f => f.chineseText === lesson.chineseText);
+            if(idx > -1) favs.splice(idx, 1); else favs.push(lesson);
+            localStorage.setItem('panpuri_favs', JSON.stringify(favs));
+            updateUI();
+        }
 
-    function speakWord(word) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = 'zh-CN'; utterance.rate = 0.75;
-        window.speechSynthesis.speak(utterance);
-    }
+        function loadFavoritesMode() {
+            const favs = JSON.parse(localStorage.getItem('panpuri_favs') || "[]");
+            if(favs.length === 0) return alert("ยังไม่มีรายการโปรด");
+            currentCategoryLessons = favs; currentIndex = 0;
+            document.getElementById('categoryBadge').innerText = "FAVORITES";
+            updateUI();
+        }
 
-    function toggleAIVoice() {
-        isAIVoiceEnabled = !isAIVoiceEnabled;
-        document.getElementById('voiceIcon').className = isAIVoiceEnabled ? "fas fa-volume-up text-green-500 mr-1" : "fas fa-volume-mute text-gray-400 mr-1";
-        document.getElementById('voiceText').innerText = isAIVoiceEnabled ? "เสียง AI: เปิด" : "เสียง AI: ปิด";
-        if (!isAIVoiceEnabled) window.speechSynthesis.cancel();
-    }
+        function playExampleAudio() {
+            const u = new SpeechSynthesisUtterance(document.getElementById('chineseText').innerText);
+            u.lang = 'zh-CN'; u.rate = 0.8; window.speechSynthesis.speak(u);
+        }
 
-    function speakAIFeedback(text) {
-        if (!isAIVoiceEnabled) return;
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'th-TH'; window.speechSynthesis.speak(utterance);
-    }
+        function speakWord(w) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(w);
+            u.lang = 'zh-CN'; u.rate = 0.8; window.speechSynthesis.speak(u);
+        }
 
-    // --- ระบบบันทึกเสียง ---
-    async function startRecording() {
-        try {
+        function toggleAIVoice() {
+            isAIVoiceEnabled = !isAIVoiceEnabled;
+            document.getElementById('voiceIcon').className = isAIVoiceEnabled ? "fas fa-volume-up mr-1" : "fas fa-volume-mute mr-1";
+            document.getElementById('voiceText').innerText = isAIVoiceEnabled ? "ON" : "OFF";
+        }
+
+        async function startRecording() {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream);
             mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-            mediaRecorder.onstop = () => sendToAI(new Blob(audioChunks, { type: 'audio/webm' }));
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = () => {
+                    fetch(GAS_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ audioBase64: reader.result, targetSentence: document.getElementById('chineseText').innerText }),
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                    }).then(res => res.json()).then(data => {
+                        document.getElementById('resultBox').classList.remove('hidden');
+                        document.getElementById('scoreText').innerText = data.score;
+                        document.getElementById('wrongWordsText').innerText = data.wrong_words.join(', ') || 'None';
+                        document.getElementById('feedbackText').innerText = data.feedback;
+                        if(isAIVoiceEnabled) {
+                            const u = new SpeechSynthesisUtterance(data.feedback);
+                            u.lang = 'th-TH'; window.speechSynthesis.speak(u);
+                        }
+                        document.getElementById('statusMsg').innerText = "Analysis Done";
+                    });
+                };
+            };
             audioChunks = []; mediaRecorder.start();
             document.getElementById('recordBtn').classList.add('mic-recording');
             document.getElementById('stopBtn').disabled = false;
-            document.getElementById('stopBtn').classList.remove('opacity-50', 'cursor-not-allowed');
-            document.getElementById('statusMsg').innerText = "🎙️ กำลังฟัง...";
-        } catch (e) { alert("กรุณาอนุญาตไมโครโฟน"); }
-    }
+            document.getElementById('stopBtn').classList.remove('opacity-20');
+            document.getElementById('statusMsg').innerText = "Listening...";
+        }
 
-    function stopRecording() {
-        mediaRecorder.stop();
-        document.getElementById('recordBtn').classList.remove('mic-recording');
-        document.getElementById('stopBtn').disabled = true;
-        document.getElementById('statusMsg').innerText = "⏳ วิเคราะห์เสียง...";
-    }
-
-    function sendToAI(blob) {
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = () => {
-            fetch(GAS_URL, {
-                method: 'POST',
-                body: JSON.stringify({ audioBase64: reader.result, targetSentence: document.getElementById('chineseText').innerText }),
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-            })
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('statusMsg').innerText = "";
-                document.getElementById('resultBox').classList.remove('hidden');
-                document.getElementById('scoreText').innerText = data.score || 0;
-                document.getElementById('wrongWordsText').innerText = data.wrong_words?.join(", ") || "ไม่มี";
-                document.getElementById('feedbackText').innerText = data.feedback;
-                speakAIFeedback(data.feedback);
-            });
-        };
-    }
-  </script>
+        function stopRecording() {
+            mediaRecorder.stop();
+            document.getElementById('recordBtn').classList.remove('mic-recording');
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('statusMsg').innerText = "Analyzing...";
+        }
+    </script>
 </body>
 </html>
