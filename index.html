@@ -451,9 +451,34 @@ function updateUI() {
         }
     }
     // --- จบส่วนระบบสไลด์ ---
+    /* Animation สำหรับสไลด์ไปหน้าถัดไป */
+.slide-next-enter {
+  animation: slideNext 0.4s ease-out;
+}
+
+/* Animation สำหรับสไลด์ย้อนกลับ */
+.slide-prev-enter {
+  animation: slidePrev 0.4s ease-out;
+}
+
+@keyframes slideNext {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slidePrev {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ทำให้ Container หลักมีการเปลี่ยนที่นุ่มนวล */
+#app-container {
+  transition: transform 0.3s ease;
+}
   </script>
 </body>
 </html>
+
 
 
 
