@@ -1,1 +1,1 @@
-# Panpuri_training_Language
+# Panpuri_Ai_training_Language
