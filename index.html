@@ -48,18 +48,24 @@
 <body>
     <div id="main-app" class="max-w-md mx-auto bg-white min-h-screen shadow-md relative flex flex-col no-select">
         <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-20">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white"><i class="fas fa-leaf text-xs"></i></div>
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 overflow-hidden rounded-xl border border-gray-100 shadow-sm">
+                    <img src="logo.jpg" alt="PAÑPURI AI Logo" class="w-full h-full object-cover">
+                </div>
                 <div>
-                    <h1 class="font-bold text-gray-900 leading-none">PAÑPURI</h1>
-                    <span class="text-[10px] text-gray-500 tracking-wider">CHINESE TEACHER</span>
+                    <h1 class="font-bold text-gray-900 leading-none tracking-tight">PAÑPURI</h1>
+                    <div class="flex items-center gap-1 mt-1">
+                        <span class="text-[9px] text-white bg-[#00472F] px-1.5 py-0.5 rounded font-bold tracking-widest">AI AGENT</span>
+                        <span class="text-[9px] text-gray-400 tracking-wider">CHINESE TEACHER</span>
+                    </div>
                 </div>
             </div>
+            <div class="text-[#00472F] opacity-10">
+                <i class="fas fa-leaf text-xl"></i>
+            </div>
         </div>
-
         <div class="p-5 flex flex-col gap-4 flex-grow">
-            <div class="flex flex-col gap-3">
-                <button onclick="loadFavoritesMode()" class="bg-red-50 text-red-600 border border-red-100 text-xs font-semibold py-2.5 rounded-xl shadow-sm active:scale-95 transition-transform">
+             <button onclick="loadFavoritesMode()" class="bg-red-50 text-red-600 border border-red-100 text-xs font-semibold py-2.5 rounded-xl shadow-sm active:scale-95 transition-transform">
                     ❤️ ทบทวนรายการโปรดของฉัน
                 </button>
                 <select id="categorySelect" onchange="changeCategory()" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl block w-full p-3 outline-none focus:ring-1 focus:ring-black">
