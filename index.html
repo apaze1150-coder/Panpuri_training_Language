@@ -30,7 +30,7 @@
             -webkit-tap-highlight-color: transparent; 
         }
 
-        /* 2. ล็อกแอปให้สูงพอดีหน้าจอมือถือ (ไม่ยืดขาวลงไปยาวๆ) */
+        /* 2. ล็อกแอปให้สูงพอดีหน้าจอมือถือ */
         #main-app { 
             height: 100dvh;
             padding-top: env(safe-area-inset-top); 
@@ -54,7 +54,7 @@
         .chinese-title { font-size: 1.5rem; font-weight: bold; color: #00472F; background: #e6eee6; padding: 5px 15px; border-radius: 20px; display: inline-block; }
         .pinyin-title { color: #666; font-style: italic; display: block; margin-top: 5px; }
 
-        /* ซ่อน Scrollbar ด้านข้างให้ดูมินิมอล แต่ยังเลื่อนได้ */
+        /* ซ่อน Scrollbar ด้านข้าง */
         .scroll-area::-webkit-scrollbar { display: none; }
         .scroll-area { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -129,6 +129,12 @@
                 <button onclick="nextLesson()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200 transition-colors"><i class="fas fa-chevron-right text-gray-500"></i></button>
             </div>
 
+            <div class="flex justify-center items-center gap-8 my-4">
+                <button onclick="playExampleAudio()" class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100 active:scale-90 transition-transform"><i class="fas fa-volume-up text-lg"></i></button>
+                <button id="recordBtn" onclick="startRecording()" class="w-20 h-20 rounded-full bg-black text-white flex items-center justify-center shadow-xl active:scale-95 transition-transform disabled:opacity-20" disabled><i class="fas fa-microphone text-3xl"></i></button>
+                <button id="stopBtn" onclick="stopRecording()" class="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center border border-red-100 opacity-20 cursor-not-allowed" disabled><i class="fas fa-paper-plane"></i></button>
+            </div>
+
             <div id="statusMsg" class="text-center text-[11px] font-bold text-blue-500 h-4 uppercase tracking-widest">Loading...</div>
 
             <div id="resultBox" class="hidden bg-emerald-50 rounded-3xl p-6 border border-emerald-100 shadow-sm mb-6 transition-all">
@@ -154,7 +160,8 @@
             </div>
         </div>
     </div>
-</body>
+    
+    </body>
 </html>
 
     <script>
