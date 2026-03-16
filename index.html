@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
     <meta name="application-name" content="Chinese Teacher">
     <meta name="apple-mobile-web-app-title" content="Chinese Teacher">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <link rel="manifest" href="manifest.json?v=1">
-
-    <link rel="icon" type="image/png" sizes="192x192" href="logo.png?v=1">
-    <link rel="apple-touch-icon" sizes="180x180" href="logo.png?v=1">
+    <link rel="manifest" href="manifest.json?v=2">
+    <link rel="icon" type="image/png" sizes="192x192" href="logo.png?v=2">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png?v=2">
     
     <title>PAÑPURI Chinese Teacher</title>
     
@@ -19,20 +20,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* ตั้งค่าพื้นฐานให้ชิดขอบทุกด้าน */
+        /* 1. ล็อก body ไม่ให้เลื่อนทะลุ */
         body { 
             font-family: 'Prompt', 'Noto Sans SC', sans-serif; 
-            background-color: #1A1A1A; /* เปลี่ยนพื้นหลังข้างนอกเป็นสีดำเพื่อให้เนียนไปกับขอบมือถือ */
+            background-color: #1A1A1A; 
             margin: 0; 
             padding: 0; 
-            overflow-x: hidden; 
+            overflow: hidden; /* ล็อกความสูง */
             -webkit-tap-highlight-color: transparent; 
         }
 
+        /* 2. ล็อกแอปให้สูงพอดีหน้าจอมือถือ (ไม่ยืดขาวลงไปยาวๆ) */
         #main-app { 
-            min-height: 100vh;
-            /* แก้ไขพื้นที่ว่างด้านบนสำหรับ iPhone รุ่นใหม่ที่มีรอยบาก */
+            height: 100dvh;
             padding-top: env(safe-area-inset-top); 
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .no-select { -webkit-user-select: none; user-select: none; }
@@ -49,27 +51,24 @@
         
         /* Keynote Product Styles */
         .keynote-product-name { background-color: #f9fbf9; border-left: 5px solid #00472F; }
-        .chinese-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #00472F;
-            background: #e6eee6;
-            padding: 5px 15px;
-            border-radius: 20px;
-            display: inline-block;
-        }
+        .chinese-title { font-size: 1.5rem; font-weight: bold; color: #00472F; background: #e6eee6; padding: 5px 15px; border-radius: 20px; display: inline-block; }
         .pinyin-title { color: #666; font-style: italic; display: block; margin-top: 5px; }
+
+        /* ซ่อน Scrollbar ด้านข้างให้ดูมินิมอล แต่ยังเลื่อนได้ */
+        .scroll-area::-webkit-scrollbar { display: none; }
+        .scroll-area { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body>
-    <div id="main-app" class="max-w-md mx-auto bg-white min-h-screen shadow-md relative flex flex-col no-select">
+    <div id="main-app" class="max-w-md mx-auto bg-white shadow-md relative flex flex-col no-select overflow-hidden">
         
-        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-20">
+        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-20 flex-shrink-0">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 overflow-hidden rounded-full border-2 border-[#C5A059] bg-white flex items-center justify-center shadow-sm">
-                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADECAYAAADA..." 
-                         class="w-full h-full object-cover">
+                
+                <div class="w-11 h-11 overflow-hidden rounded-full border border-[#C5A059] bg-[#1A1A1A] flex items-center justify-center shadow-sm">
+                    <img src="logo.png?v=2" class="w-full h-full object-contain p-1">
                 </div>
+                
                 <div>
                     <h1 class="font-bold text-gray-900 leading-none tracking-tight" style="font-family: 'Playfair Display', serif;">PAÑPURI</h1>
                     <div class="flex items-center gap-1 mt-1">
@@ -83,7 +82,8 @@
             </div>
         </div>
 
-        <div class="p-5 flex flex-col gap-4 flex-grow">
+        <div class="p-5 flex flex-col gap-4 flex-grow overflow-y-auto scroll-area pb-10">
+            
             <div class="flex flex-col gap-3">
                 <button onclick="loadFavoritesMode()" class="bg-red-50 text-red-600 border border-red-100 text-xs font-semibold py-2.5 rounded-xl shadow-sm active:scale-95 transition-transform">
                     ❤️ ทบทวนรายการโปรดของฉัน
